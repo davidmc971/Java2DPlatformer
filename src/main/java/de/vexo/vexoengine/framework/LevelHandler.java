@@ -28,7 +28,7 @@ public class LevelHandler {
 		this.numLevel = numLevel;
 		System.out.println("Level "+numLevel);
 		try{
-			level = loader.loadImage("/levels/level"+numLevel+".png");
+			level = loader.loadImage("/img/levels/level"+numLevel+".png");
 			loadImageLevel(level);
 		} catch(Exception e){
 			System.out.println("Level existiert nicht.");

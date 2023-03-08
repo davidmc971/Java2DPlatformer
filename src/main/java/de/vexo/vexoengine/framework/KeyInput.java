@@ -1,10 +1,6 @@
 package de.vexo.vexoengine.framework;
 
-import java.awt.event.KeyAdapter;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import static org.lwjgl.glfw.GLFW.*;
 
 import de.vexo.vexoengine.main.Game;
 import de.vexo.vexoengine.main.Handler;
@@ -13,6 +9,7 @@ import de.vexo.vexoengine.objects.Player;
 public class KeyInput extends Thread {
 	Handler handler;
 	Game game;
+	private long window;
 	
 	public KeyInput(Handler handler, Game game){
 		this.handler = handler;
@@ -20,30 +17,30 @@ public class KeyInput extends Thread {
 	}
 	
 	public void checkKeys(){
+		this.window = game.getWindow();
 		
 		for(int i = 0; i < handler.object.size(); i++){
 			GameObject tempObject = handler.object.get(i);
 			
 			if(tempObject.getId() == ObjectId.Player){
-				if(Keyboard.isKeyDown(Keyboard.KEY_A)){
+				if(glfwGetKey(this.window, GLFW_KEY_A) == GLFW_PRESS){
 					tempObject.setVelX(-3.5f);
-				} else if(Keyboard.isKeyDown(Keyboard.KEY_D)){
+				} else if(glfwGetKey(this.window, GLFW_KEY_D) == GLFW_PRESS){
 					tempObject.setVelX(3.5f);
 				} else tempObject.setVelX(0);
-				if(Keyboard.isKeyDown(Keyboard.KEY_SPACE) && !tempObject.isJumping()){
+				if(glfwGetKey(this.window, GLFW_KEY_SPACE) == GLFW_PRESS && !tempObject.isJumping()){
 					tempObject.setVelY(-9.5f);
 					tempObject.setJumping(true);
 				}
-				if(Mouse.isButtonDown(0)){
+				if(glfwGetMouseButton(this.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
 					((Player)tempObject).setCameraFocus(false);
-				}
-				if(!Mouse.isButtonDown(0)){
+				} else {
 					((Player)tempObject).setCameraFocus(true);
 				}
 			}
 		}
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
+		if(glfwGetKey(this.window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
 			game.exitGame();
 		}
 	}
