@@ -1,10 +1,10 @@
-package de.vexo.vexoengine.framework;
+package io.github.davidmc971.java2dplatformer.framework;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-import de.vexo.vexoengine.main.Game;
-import de.vexo.vexoengine.main.Handler;
-import de.vexo.vexoengine.objects.Player;
+import io.github.davidmc971.java2dplatformer.main.Game;
+import io.github.davidmc971.java2dplatformer.main.Handler;
+import io.github.davidmc971.java2dplatformer.objects.Player;
 
 public class KeyInput extends Thread {
 	Handler handler;

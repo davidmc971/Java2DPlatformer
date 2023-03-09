@@ -1,6 +1,6 @@
-package de.vexo.vexoengine.main;
+package io.github.davidmc971.java2dplatformer.main;
 
-import static de.vexo.vexoengine.graphics.RenderUtil.*;
+import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 // import static org.lwjgl.util.glu.GLU.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -12,20 +12,21 @@ import java.io.BufferedReader;
 import java.util.Random;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
+import io.github.davidmc971.java2dplatformer.framework.KeyInput;
+import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.objects.Player;
+
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-
-import de.vexo.vexoengine.framework.KeyInput;
-import de.vexo.vexoengine.framework.LevelHandler;
-import de.vexo.vexoengine.framework.ObjectId;
-import de.vexo.vexoengine.objects.Player;
 
 public class Game implements Runnable {
 	public static int WIDTH, HEIGHT;
@@ -45,8 +46,8 @@ public class Game implements Runnable {
 	private FloatBuffer fbProjectionMatrix;
 	private FloatBuffer fbViewMatrix;
 	private FloatBuffer fbModelMatrix;
-	private Matrix4f m4fProjection;
-	private Matrix4f m4fView;
+	// private Matrix4f m4fProjection;
+	// private Matrix4f m4fView;
 	private Matrix4f m4fModel;
 
 	public synchronized void start(int w, int h, String title) {
@@ -86,7 +87,7 @@ public class Game implements Runnable {
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			while (delta >= 1) {
-				tick();
+				update(delta);
 				if (glfwWindowShouldClose(window))
 					running = false;
 				updates++;
@@ -116,8 +117,8 @@ public class Game implements Runnable {
 		fbProjectionMatrix = MemoryUtil.memAllocFloat(16);
 		fbViewMatrix = MemoryUtil.memAllocFloat(16);
 		fbModelMatrix = MemoryUtil.memAllocFloat(16);
-		m4fProjection = new Matrix4f();
-		m4fView = new Matrix4f();
+		// m4fProjection = new Matrix4f();
+		// m4fView = new Matrix4f();
 		m4fModel = new Matrix4f();
 
 		glfwInit();
@@ -150,7 +151,8 @@ public class Game implements Runnable {
 
 		levelh.loadLevel(1);
 
-		cam = new Camera(0, 0, 0, w, h, window);
+		cam = new Camera(new Vector3f(0, 0, 0));
+		cam.setupOrtho(w, h);
 
 		// handler.addObject(new Player(100, 100, handler, ObjectId.Player));
 
@@ -165,14 +167,14 @@ public class Game implements Runnable {
 	private int locModel;
 
 	private float[] vertexArray = {
-			// position // color
-			0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // 0
-			-0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // 1
-			0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 2
-			-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f // 3
+			// position // color // uv
+			740, 260, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // 0
+			540, 460, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // 1
+			740, 460, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1, 1, // 2
+			540, 260, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0 // 3
 	};
 
-	// counter clockwise
+	// counterclockwise
 	private int[] elementArray = {
 			2, 1, 0,
 			0, 1, 3
@@ -189,10 +191,10 @@ public class Game implements Runnable {
 
 		try {
 			BufferedReader vertexReader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(getClass().getResource("/shaders/main.vert").getPath())));
+					getClass().getResourceAsStream("/shaders/main.vert")));
 
 			BufferedReader fragmentReader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(getClass().getResource("/shaders/main.frag").getPath())));
+					getClass().getResourceAsStream("/shaders/main.frag")));
 
 			while ((line = vertexReader.readLine()) != null) {
 				stringBuilder.append(line).append("\n");
@@ -288,22 +290,25 @@ public class Game implements Runnable {
 		// vertex arttrib pointer
 		int positionsSize = 3;
 		int colorSize = 4;
-		int floatSizeBytes = 4;
-		int vertexSizeBytes = (positionsSize + colorSize) * floatSizeBytes;
+		int uvSize = 2;
+		int vertexSizeBytes = (positionsSize + colorSize + uvSize) * Float.BYTES;
 		glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0);
 		glEnableVertexAttribArray(0);
 
-		glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
+		glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * Float.BYTES);
 		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize) * Float.BYTES);
+		glEnableVertexAttribArray(2);
 	}
 
-	private void tick() {
+	private void update(double dt) {
 		handler.tick();
 		keyInput.checkKeys();
-		for (int i = 0; i < handler.object.size(); i++) {
-			if (handler.object.get(i).getId() == ObjectId.Player)
-				cam.tick((Player) handler.object.get(i));
-		}
+		// for (int i = 0; i < handler.object.size(); i++) {
+		// if (handler.object.get(i).getId() == ObjectId.Player)
+		// cam.tick((Player) handler.object.get(i));
+		// }
 	}
 
 	private void render() {
@@ -315,16 +320,13 @@ public class Game implements Runnable {
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 
-		m4fProjection.identity();
-				//.ortho2D(0, w, h, 0).translate(cam.getX(), cam.getY(), 0);
-		m4fView.identity();
 		m4fModel.identity();
-		glUniformMatrix4fv(locProjection, false, m4fProjection.get(fbProjectionMatrix));
-		glUniformMatrix4fv(locView, false, m4fView.get(fbViewMatrix));
+		glUniformMatrix4fv(locProjection, false, cam.getProjectionMatrix().get(fbProjectionMatrix));
+		glUniformMatrix4fv(locView, false, cam.getViewMatrix().get(fbViewMatrix));
 		glUniformMatrix4fv(locModel, false, m4fModel.get(fbModelMatrix));
 
 		glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
-		
+
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 

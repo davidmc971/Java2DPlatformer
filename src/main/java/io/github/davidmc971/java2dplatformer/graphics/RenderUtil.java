@@ -1,4 +1,4 @@
-package de.vexo.vexoengine.graphics;
+package io.github.davidmc971.java2dplatformer.graphics;
 
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glColor3f;

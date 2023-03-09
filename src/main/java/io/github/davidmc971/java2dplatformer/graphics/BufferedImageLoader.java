@@ -1,4 +1,4 @@
-package de.vexo.vexoengine.graphics;
+package io.github.davidmc971.java2dplatformer.graphics;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

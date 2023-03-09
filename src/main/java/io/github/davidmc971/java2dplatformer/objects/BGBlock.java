@@ -1,12 +1,13 @@
-package de.vexo.vexoengine.objects;
+package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
-import de.vexo.vexoengine.framework.BGType;
-import de.vexo.vexoengine.framework.GameObject;
-import de.vexo.vexoengine.framework.ObjectId;
-import static de.vexo.vexoengine.graphics.RenderUtil.*;
+import io.github.davidmc971.java2dplatformer.framework.BGType;
+import io.github.davidmc971.java2dplatformer.framework.GameObject;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+
+import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class BGBlock extends GameObject {

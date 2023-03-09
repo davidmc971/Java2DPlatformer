@@ -1,13 +1,13 @@
-package de.vexo.vexoengine.main;
+package io.github.davidmc971.java2dplatformer.main;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
-import de.vexo.vexoengine.framework.GameObject;
-import de.vexo.vexoengine.framework.ObjectId;
-import de.vexo.vexoengine.objects.Block;
-import de.vexo.vexoengine.framework.LevelHandler;
+import io.github.davidmc971.java2dplatformer.framework.GameObject;
+import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.objects.Block;
 
 public class Handler {
 	

@@ -2,6 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'application'
+		id "com.github.johnrengelman.shadow" version "8.1.0"
 }
 
 project.ext.lwjglVersion = "3.3.1"
@@ -28,6 +29,8 @@ switch (OperatingSystem.current()) {
 repositories {
 	mavenCentral()
 }
+
+// project.ext.lwjglNatives = "natives-windows-x86"
 
 dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
@@ -68,9 +71,27 @@ dependencies {
 }
 
 application {
-    mainClass = 'de.vexo.vexoengine.Start'
+    mainClass = 'io.github.davidmc971.java2dplatformer.Start'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+task copyToJars(type: Copy) {
+	from(":LWJGL2DPlatformer:shadowJar")
+	rename '(.*)-all.jar', '$1.jar'
+	into file('jars')
+}
+
+task cleanJars() {
+  delete file('jars')
+}
+
+tasks.named("clean") {
+  dependsOn cleanJars
+}
+
+tasks.named("build") {
+  dependsOn copyToJars
 }

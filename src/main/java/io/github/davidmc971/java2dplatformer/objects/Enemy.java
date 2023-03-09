@@ -1,13 +1,13 @@
-package de.vexo.vexoengine.objects;
+package io.github.davidmc971.java2dplatformer.objects;
 
-import static de.vexo.vexoengine.graphics.RenderUtil.color3_255;
+import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.color3_255;
 import static org.lwjgl.opengl.GL11.glRectf;
 
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
-import de.vexo.vexoengine.framework.GameObject;
-import de.vexo.vexoengine.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.framework.GameObject;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 
 public class Enemy extends GameObject {
 

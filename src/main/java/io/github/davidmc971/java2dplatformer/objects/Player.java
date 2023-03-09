@@ -1,15 +1,15 @@
-package de.vexo.vexoengine.objects;
+package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
 
+import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 import static org.lwjgl.opengl.GL11.*;
-import static de.vexo.vexoengine.graphics.RenderUtil.*;
 
 import java.util.LinkedList;
 
-import de.vexo.vexoengine.framework.GameObject;
-import de.vexo.vexoengine.framework.ObjectId;
-import de.vexo.vexoengine.main.Handler;
+import io.github.davidmc971.java2dplatformer.framework.GameObject;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.main.Handler;
 
 public class Player extends GameObject {
 

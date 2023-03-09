@@ -1,4 +1,4 @@
-package de.vexo.vexoengine.framework;
+package io.github.davidmc971.java2dplatformer.framework;
 
 import java.awt.Rectangle;
 import java.util.LinkedList;

@@ -1,14 +1,15 @@
-package de.vexo.vexoengine.objects;
+package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
 import java.util.LinkedList;
 
-import static org.lwjgl.opengl.GL11.*;
-import static de.vexo.vexoengine.graphics.RenderUtil.*;
-import de.vexo.vexoengine.framework.GameObject;
-import de.vexo.vexoengine.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.framework.GameObject;
+import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 
-public class Block extends de.vexo.vexoengine.framework.GameObject{
+import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
+import static org.lwjgl.opengl.GL11.*;
+
+public class Block extends io.github.davidmc971.java2dplatformer.framework.GameObject{
 
 	public Block(float x, float y, ObjectId id) {
 		super(x, y, id);

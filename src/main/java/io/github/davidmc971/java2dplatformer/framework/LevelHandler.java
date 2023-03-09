@@ -1,12 +1,12 @@
-package de.vexo.vexoengine.framework;
+package io.github.davidmc971.java2dplatformer.framework;
 
 import java.awt.image.BufferedImage;
 
-import de.vexo.vexoengine.graphics.BufferedImageLoader;
-import de.vexo.vexoengine.main.Game;
-import de.vexo.vexoengine.main.Handler;
-import de.vexo.vexoengine.objects.Block;
-import de.vexo.vexoengine.objects.Player;
+import io.github.davidmc971.java2dplatformer.graphics.BufferedImageLoader;
+import io.github.davidmc971.java2dplatformer.main.Game;
+import io.github.davidmc971.java2dplatformer.main.Handler;
+import io.github.davidmc971.java2dplatformer.objects.Block;
+import io.github.davidmc971.java2dplatformer.objects.Player;
 
 public class LevelHandler {
 	private BufferedImage level = null;

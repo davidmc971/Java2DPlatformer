@@ -1,4 +1,4 @@
-package de.vexo.vexoengine.queue;
+package io.github.davidmc971.java2dplatformer.queue;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
