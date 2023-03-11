@@ -12,16 +12,23 @@ import java.io.BufferedReader;
 import java.util.Random;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
+import io.github.davidmc971.java2dplatformer.components.ColoredBoxRenderer;
 import io.github.davidmc971.java2dplatformer.framework.KeyInput;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 import io.github.davidmc971.java2dplatformer.objects.Player;
+import io.github.davidmc971.java2dplatformer.rendering.Shader;
+import io.github.davidmc971.java2dplatformer.rendering.ShaderProgram;
+import io.github.davidmc971.java2dplatformer.rendering.ShaderType;
+import io.github.davidmc971.java2dplatformer.rendering.Vertex;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -75,6 +82,7 @@ public class Game implements Runnable {
 		// }
 		init();
 		initGL();
+		initScene();
 		long lastTime = System.nanoTime();
 		double amountOfTicks = 60.0;
 		double ns = 1000000000 / amountOfTicks;
@@ -161,7 +169,7 @@ public class Game implements Runnable {
 		keyInput = new KeyInput(handler, this);
 	}
 
-	private int program, vao, vbo, ebo;
+	private int vao, vbo, ebo;
 	private int locProjection;
 	private int locView;
 	private int locModel;
@@ -180,35 +188,26 @@ public class Game implements Runnable {
 			0, 1, 3
 	};
 
+	private ShaderProgram shaderProgram;
+	private Shader vertexShader, fragmentShader;
+
 	private void initGL() {
 		GL.createCapabilities();
 		clearColor3_255(0, 0, 20);
 
-		StringBuilder stringBuilder = new StringBuilder();
-		String line = "";
+		// Create shader program
+		shaderProgram = new ShaderProgram();
 
-		CharSequence vertexSource, fragmentSource;
+		int vertexId, fragmentId;
 
 		try {
-			BufferedReader vertexReader = new BufferedReader(new InputStreamReader(
-					getClass().getResourceAsStream("/shaders/main.vert")));
+			// Load and compile vertex shader
+		vertexShader = Shader.loadInternal("/shaders/main.vert");
+		vertexId = vertexShader.shaderId;
 
-			BufferedReader fragmentReader = new BufferedReader(new InputStreamReader(
-					getClass().getResourceAsStream("/shaders/main.frag")));
-
-			while ((line = vertexReader.readLine()) != null) {
-				stringBuilder.append(line).append("\n");
-			}
-
-			vertexSource = stringBuilder.toString();
-
-			stringBuilder = new StringBuilder();
-
-			while ((line = fragmentReader.readLine()) != null) {
-				stringBuilder.append(line).append("\n");
-			}
-
-			fragmentSource = stringBuilder.toString();
+		// Load and compile fragment shader
+		fragmentShader = Shader.loadInternal("/shaders/main.frag");
+		fragmentId = fragmentShader.shaderId;
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -216,30 +215,11 @@ public class Game implements Runnable {
 			return;
 		}
 
-		// Create shader program
-		program = glCreateProgram();
-
-		// Load and compile vertex shader
-		int vertexId = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexId, vertexSource);
-		glCompileShader(vertexId);
-		if (glGetShaderi(vertexId, GL_COMPILE_STATUS) != GL_TRUE) {
-			System.out.println(glGetShaderInfoLog(vertexId, Integer.MAX_VALUE));
-			throw new RuntimeException();
-		}
-
-		// Load and compile fragment shader
-		int fragmentId = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentId, fragmentSource);
-		glCompileShader(fragmentId);
-		if (glGetShaderi(fragmentId, GL_COMPILE_STATUS) != GL_TRUE) {
-			System.out.println(glGetShaderInfoLog(fragmentId, Integer.MAX_VALUE));
-			throw new RuntimeException();
-		}
-
 		// Attach vertex and fragment shader to program
-		glAttachShader(program, vertexId);
-		glAttachShader(program, fragmentId);
+		shaderProgram.attachShader(vertexShader);
+		shaderProgram.attachShader(fragmentShader);
+
+		int program = shaderProgram.programId;
 
 		// Link program and verify its status
 		glLinkProgram(program);
@@ -270,14 +250,16 @@ public class Game implements Runnable {
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
+		int numVerticesInBuffer = 2048;
+
 		// FB of vertices
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.length);
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(Vertex.size() * numVerticesInBuffer);
 		vertexBuffer.put(vertexArray).flip();
 
 		// VBO
 		vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_DYNAMIC_DRAW);
 
 		// Indices
 		IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.length);
@@ -302,7 +284,25 @@ public class Game implements Runnable {
 		glEnableVertexAttribArray(2);
 	}
 
+	private Scene mainScene = new Scene() {
+
+		@Override
+		public void update(float dt) {
+			gameObjects.forEach((go) -> go.update(dt));
+		}
+
+	};
+
+	private void initScene() {
+		io.github.davidmc971.java2dplatformer.ecs.GameObject testObject = new io.github.davidmc971.java2dplatformer.ecs.GameObject(
+				"test");
+		// testObject.addComponent(new ColoredBoxRenderer());
+		mainScene.addGameObject(testObject);
+		mainScene.start();
+	}
+
 	private void update(double dt) {
+		mainScene.update((float) dt);
 		handler.tick();
 		keyInput.checkKeys();
 		// for (int i = 0; i < handler.object.size(); i++) {
@@ -314,7 +314,7 @@ public class Game implements Runnable {
 	private void render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(program);
+		glUseProgram(shaderProgram.programId);
 		glBindVertexArray(vao);
 
 		glEnableVertexAttribArray(0);
@@ -327,17 +327,18 @@ public class Game implements Runnable {
 
 		glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
 
 		// //! Render 2D Code
 		// glTranslatef(cx, cy, 0);
 		// glEnable(GL_BLEND);
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		// handler.renderBG();
+		handler.renderBG(locModel, m4fModel, fbModelMatrix, 0, 1);
 		// handler.render();
 		// glDisable(GL_BLEND);
 		// glTranslatef(-cx, -cy, 0);
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 
 		glBindVertexArray(0);
 		glUseProgram(0);
