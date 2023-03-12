@@ -222,31 +222,19 @@ public class Game implements Runnable {
 		int program = shaderProgram.programId;
 
 		// Link program and verify its status
-		glLinkProgram(program);
-		if (glGetProgrami(program, GL_LINK_STATUS) != GL_TRUE) {
-			System.out.println(glGetProgramInfoLog(program, Integer.MAX_VALUE));
-			throw new RuntimeException();
-		}
+		shaderProgram.link();
 
 		// Model location reference to inside shader program
-		locModel = glGetUniformLocation(program, "model");
-		if (locModel == -1) {
-			throw new RuntimeException();
-		}
+		locModel = shaderProgram.getUniformLocation("model");
 
 		// View location reference to inside shader program
-		locView = glGetUniformLocation(program, "view");
-		if (locView == -1) {
-			throw new RuntimeException();
-		}
+		locView = shaderProgram.getUniformLocation("view");
 
 		// Projection location reference to inside shader program
-		locProjection = glGetUniformLocation(program, "projection");
-		if (locProjection == -1) {
-			throw new RuntimeException();
-		}
+		locProjection = shaderProgram.getUniformLocation("projection");
 
 		// Generate VAO, VBO, EBO
+		// Create and bind VAO
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
@@ -259,7 +247,7 @@ public class Game implements Runnable {
 		// VBO
 		vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STREAM_DRAW);
 
 		// Indices
 		IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.length);
@@ -267,7 +255,7 @@ public class Game implements Runnable {
 
 		ebo = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STREAM_DRAW);
 
 		// vertex arttrib pointer
 		int positionsSize = 3;

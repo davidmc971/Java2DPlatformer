@@ -3,7 +3,9 @@ package io.github.davidmc971.java2dplatformer.rendering;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 public class ShaderProgram {
   public final int programId;
@@ -16,6 +18,22 @@ public class ShaderProgram {
   public void attachShader(Shader shader) {
     GL20.glAttachShader(programId, shader.shaderId);
     attachedShaders.add(shader);
+  }
+
+  public void link() {
+    GL20.glLinkProgram(programId);
+		if (GL20.glGetProgrami(programId, GL20.GL_LINK_STATUS) != GL11.GL_TRUE) {
+			System.out.println(GL30.glGetProgramInfoLog(programId, Integer.MAX_VALUE));
+			throw new RuntimeException();
+		}
+  }
+
+  public int getUniformLocation(String uniformName) {
+    int location = GL20.glGetUniformLocation(programId, uniformName);
+    if (location == -1) {
+      throw new RuntimeException();
+    }
+    return location;
   }
 
   @Override
