@@ -6,6 +6,7 @@ import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 import io.github.davidmc971.java2dplatformer.objects.BGBlock;
+import io.github.davidmc971.java2dplatformer.objects.Player;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Handler {
@@ -19,23 +20,22 @@ public class Handler {
 		this.game = game;
 	}
 
-	public void tick() {
+	public void tick(float dt) {
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
-
-			tempObject.tick(object);
+			tempObject.preUpdate();
+			tempObject.update(dt, object);
 		}
-
 	}
 
-	public void render(Renderer renderer) {
+	public void render(Renderer renderer, float lerp, Camera camera) {
 
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() != ObjectId.Background) {
 				if (tempObject.getId() != ObjectId.Player) {
-					tempObject.render(renderer);
+					tempObject.onRender(renderer, lerp);
 				}
 			}
 		}
@@ -43,6 +43,8 @@ public class Handler {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() == ObjectId.Player) {
+				tempObject.preRender(lerp);
+				camera.tick((Player) tempObject);
 				tempObject.render(renderer);
 			}
 		}
@@ -56,12 +58,12 @@ public class Handler {
 		this.object.remove(object);
 	}
 
-	public void renderBG(Renderer renderer) {
+	public void renderBG(Renderer renderer, float lerp) {
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() == ObjectId.Background) {
-				((BGBlock) tempObject).render(renderer);
+				((BGBlock) tempObject).onRender(renderer, lerp);
 			}
 		}
 	}

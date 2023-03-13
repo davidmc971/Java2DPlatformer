@@ -10,6 +10,8 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public abstract class GameObject {
 	protected Vector3f position = new Vector3f();
+	protected Vector3f lastPosition = new Vector3f();
+	protected Vector3f interpolatedPosition = new Vector3f();
 	protected Vector3f dimensions = new Vector3f(32, 32, 0);
 	protected Vector3f velocity = new Vector3f();
 	protected Vector4f color = new Vector4f(1, 1, 1, 1);
@@ -23,7 +25,20 @@ public abstract class GameObject {
 		this.id = id;
 	}
 
-	public abstract void tick(LinkedList<GameObject> object);
+	public void preUpdate() {
+		lastPosition.set(position);
+	}
+
+	public abstract void update(float dt, LinkedList<GameObject> object);
+
+	public void onRender(Renderer renderer, float lerp) {
+		preRender(lerp);
+		render(renderer);
+	}
+
+	public void preRender(float lerp) {
+		lastPosition.lerp(position, lerp, interpolatedPosition);
+	}
 
 	public abstract void render(Renderer renderer);
 
@@ -95,5 +110,29 @@ public abstract class GameObject {
 
 	public void setJumping(boolean jumping) {
 		this.jumping = jumping;
+	}
+
+	public Vector3f getPosition() {
+		return position;
+	}
+
+	public Vector3f getLastPosition() {
+		return lastPosition;
+	}
+
+	public Vector3f getInterpolatedPosition() {
+		return interpolatedPosition;
+	}
+
+	public Vector3f getDimensions() {
+		return dimensions;
+	}
+
+	public Vector3f getVelocity() {
+		return velocity;
+	}
+
+	public Vector4f getColor() {
+		return color;
 	}
 }

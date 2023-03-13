@@ -47,6 +47,11 @@ public class Game implements Runnable {
 		init();
 		initGL();
 		initScene();
+		// legacyLoop();
+		interpolationGameLoop();
+	}
+
+	protected void legacyLoop() {
 		long lastTime = System.nanoTime();
 		double amountOfTicks = 60.0;
 		double ns = 1000000000 / amountOfTicks;
@@ -59,13 +64,14 @@ public class Game implements Runnable {
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			while (delta >= 1) {
+				// TODO: lerp based on interpolation
 				update(delta);
 				if (glfwWindowShouldClose(window))
 					running = false;
 				updates++;
 				delta--;
 			}
-			render();
+			render(1f);
 			frames++;
 
 			if (System.currentTimeMillis() - timer > 1000) {
@@ -73,6 +79,54 @@ public class Game implements Runnable {
 				System.out.println("FPS: " + frames + " TICKS: " + updates);
 				frames = 0;
 				updates = 0;
+			}
+		}
+	}
+
+	protected void interpolationGameLoop() {
+		long lastTime = System.nanoTime();
+		double updatesPerSecond = 23.0f;
+		double updateTimeStep = 1 / updatesPerSecond;
+
+		// At 165 Hz should end up as 0.00606060606061
+		double frameTime = 0;
+
+		long updateDisplayTimer = System.currentTimeMillis();
+		int lastUpdatesPerSecond = 0;
+		int lastFramesPerSecond = 0;
+		long now = 0;
+		double accumulator = 0;
+
+		double renderLerp = 0;
+
+		double totalSecondsUpdated = 0;
+
+		while (running) {
+			now = System.nanoTime();
+			frameTime = (now - lastTime) / 1_000_000_000d;
+			lastTime = now;
+			accumulator += frameTime;
+
+			while (accumulator >= updateTimeStep) {
+				update((float) updateTimeStep);
+				if (glfwWindowShouldClose(window))
+					running = false;
+				lastUpdatesPerSecond++;
+				accumulator -= updateTimeStep;
+				totalSecondsUpdated += updateTimeStep;
+			}
+
+			renderLerp = accumulator / updateTimeStep;
+			renderLerp = Math.max(Math.min(renderLerp, 1.0d), 0.0d);
+
+			render((float) renderLerp);
+			lastFramesPerSecond++;
+
+			if (System.currentTimeMillis() - updateDisplayTimer > 1000) {
+				updateDisplayTimer += 1000;
+				System.out.println("FPS: " + lastFramesPerSecond + " TICKS: " + lastUpdatesPerSecond);
+				lastFramesPerSecond = 0;
+				lastUpdatesPerSecond = 0;
 			}
 		}
 	}
@@ -148,23 +202,19 @@ public class Game implements Runnable {
 
 	private void update(double dt) {
 		mainScene.update((float) dt);
-		handler.tick();
+		handler.tick((float) dt);
 		keyInput.checkKeys();
-		for (int i = 0; i < handler.object.size(); i++) {
-			if (handler.object.get(i).getId() == ObjectId.Player)
-				cam.tick((Player) handler.object.get(i));
-		}
 	}
 
-	private void render() {
+	private void render(float renderLerp) {
 		renderer.preFrame();
 
 		// renderer.queueTestSquare();
 		// renderer.flush();
 
 		// //! Render 2D Code
-		handler.renderBG(renderer);
-		handler.render(renderer);
+		handler.renderBG(renderer, renderLerp);
+		handler.render(renderer, renderLerp, cam);
 
 		renderer.flush();
 

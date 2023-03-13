@@ -24,12 +24,12 @@ public class KeyInput extends Thread {
 			
 			if(tempObject.getId() == ObjectId.Player){
 				if(glfwGetKey(this.window, GLFW_KEY_A) == GLFW_PRESS){
-					tempObject.setVelX(-3.5f);
+					tempObject.setVelX(-180f);
 				} else if(glfwGetKey(this.window, GLFW_KEY_D) == GLFW_PRESS){
-					tempObject.setVelX(3.5f);
+					tempObject.setVelX(180f);
 				} else tempObject.setVelX(0);
 				if(glfwGetKey(this.window, GLFW_KEY_SPACE) == GLFW_PRESS && !tempObject.isJumping()){
-					tempObject.setVelY(-9.5f);
+					tempObject.setVelY(-350f);
 					tempObject.setJumping(true);
 				}
 				if(glfwGetMouseButton(this.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){

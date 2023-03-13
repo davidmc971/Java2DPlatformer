@@ -15,7 +15,7 @@ public class BGBlock extends GameObject {
 		super(x, y, ObjectId.Background);
 	}
 
-	public void tick(LinkedList<GameObject> object) {
+	public void update(float dt, LinkedList<GameObject> object) {
 		counter += 0.1;
 		if (counter == 360) {
 			counter = 0;

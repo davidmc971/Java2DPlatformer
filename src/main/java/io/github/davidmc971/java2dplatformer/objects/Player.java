@@ -12,8 +12,8 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 public class Player extends GameObject {
 
 	private float width = 32, height = 64;
-	private float gravity = 0.5f;
-	private final float MAX_SPEED = 10;
+	private float gravity = 700f;
+	private final float MAX_SPEED = 750;
 	private Handler handler;
 	private float checkX, checkY;
 	private boolean cameraFocus = true;
@@ -24,18 +24,19 @@ public class Player extends GameObject {
 		this.checkX = getX();
 		this.checkY = getY();
 		if (handler.getLevelHandler().getLevel() == 2) {
-			this.gravity = 0.3f;
-		} else {
-			this.gravity = 0.5f;
+			this.gravity *= 0.5f;
 		}
 	}
 
-	public void tick(LinkedList<GameObject> object) {
-		position.x += velocity.x;
-		position.y += velocity.y;
+	public void update(float dt, LinkedList<GameObject> object) {
+		position.x += velocity.x * dt;
+		position.y += velocity.y * dt;
 		if (falling || jumping) {
-			velocity.y += gravity;
-			if (velocity.y > MAX_SPEED) {
+			velocity.y += gravity * dt;
+			if (velocity.y >= 0) {
+				velocity.y *= 1 + (0.15f * dt);
+			}
+			if (Math.abs(velocity.y) > MAX_SPEED) {
 				velocity.y = MAX_SPEED;
 			}
 		}
@@ -101,7 +102,7 @@ public class Player extends GameObject {
 						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setVelY(this.getVelY() - 0.8f);
+					this.setVelY(this.getVelY() - 18f);
 				}
 
 			}
@@ -109,9 +110,9 @@ public class Player extends GameObject {
 	}
 
 	public void render(Renderer renderer) {
-		renderer.drawQuad(position.x, position.y, position.z, width, height,
+		renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, width, height,
 				200f / 255f, 100f / 255f, 0f / 255f, 127);
-		if (true)
+		if (false)
 			for (int i = 0; i < getBoundsAll().length; i++) {
 				Rectangle r = getBoundsAll()[i];
 				renderer.drawQuad(r.x, r.y, 0, r.width, r.height,
@@ -125,9 +126,11 @@ public class Player extends GameObject {
 
 	public Rectangle[] getBoundsAll() {
 		return new Rectangle[] {
-				new Rectangle((int) (position.x + width / 4), (int) (position.y + height / 2), (int) width / 2, (int) height / 2), // Bottom
+				new Rectangle((int) (position.x + width / 4), (int) (position.y + height / 2), (int) width / 2,
+						(int) height / 2), // Bottom
 				new Rectangle((int) (position.x + width / 4), (int) position.y, (int) width / 2, (int) height / 2), // Top
-				new Rectangle((int) (position.x + width - width / 4), (int) (position.y + 4), (int) width / 4, (int) (height - 8)), // Right
+				new Rectangle((int) (position.x + width - width / 4), (int) (position.y + 4), (int) width / 4,
+						(int) (height - 8)), // Right
 				new Rectangle((int) position.x, (int) (position.y + 4), (int) width / 4, (int) (height - 8)) };// Left
 	}
 

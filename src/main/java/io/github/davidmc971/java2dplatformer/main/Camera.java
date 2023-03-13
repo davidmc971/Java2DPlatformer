@@ -165,8 +165,8 @@ public class Camera {
 
 	public void tick(Player player) {
 		if (player.getFocusCamera()) {
-			v3fPosition.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2;
-			v3fPosition.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2;
+			v3fPosition.x = -((int)player.getInterpolatedPosition().x) + Game.WIDTH / 2 - player.getBounds().width / 2;
+			v3fPosition.y = -((int)player.getInterpolatedPosition().y) + Game.HEIGHT / 2 - player.getBounds().height / 2;
 		} // else {
 		// 	glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
 		// 	this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
