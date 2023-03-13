@@ -5,7 +5,7 @@
       "name": "Start",
       "request": "launch",
       "mainClass": "io.github.davidmc971.java2dplatformer.Start",
-      "projectName": "LWJGL2DPlatformer"
+      "projectName": "Java2DPlatformer"
     }
   ]
 }

@@ -24,7 +24,7 @@ public class Shader {
     GL20.glCompileShader(shaderId);
 
     if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) != GL11.GL_TRUE) {
-      System.err.println(GL20.glGetShaderInfoLog(shaderId, Integer.MAX_VALUE));
+      System.err.println(GL20.glGetShaderInfoLog(shaderId, GL20.glGetShaderi(shaderId, GL20.GL_INFO_LOG_LENGTH)));
       throw new RuntimeException();
     }
   }

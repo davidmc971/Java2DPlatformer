@@ -1,17 +1,12 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.nio.FloatBuffer;
 import java.util.LinkedList;
-
-import org.joml.Matrix4f;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 import io.github.davidmc971.java2dplatformer.objects.BGBlock;
-import io.github.davidmc971.java2dplatformer.objects.Block;
+import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Handler {
 
@@ -33,14 +28,14 @@ public class Handler {
 
 	}
 
-	public void render() {
+	public void render(Renderer renderer) {
 
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() != ObjectId.Background) {
 				if (tempObject.getId() != ObjectId.Player) {
-					tempObject.render();
+					tempObject.render(renderer);
 				}
 			}
 		}
@@ -48,7 +43,7 @@ public class Handler {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() == ObjectId.Player) {
-				tempObject.render();
+				tempObject.render(renderer);
 			}
 		}
 	}
@@ -61,13 +56,12 @@ public class Handler {
 		this.object.remove(object);
 	}
 
-	public void renderBG(int locModel, Matrix4f m4fModel, FloatBuffer fbModelMatrix, int positionAttrib,
-			int colorAttrib) {
+	public void renderBG(Renderer renderer) {
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 
 			if (tempObject.getId() == ObjectId.Background) {
-				((BGBlock) tempObject).render(locModel, m4fModel, fbModelMatrix, positionAttrib, colorAttrib);
+				((BGBlock) tempObject).render(renderer);
 			}
 		}
 	}

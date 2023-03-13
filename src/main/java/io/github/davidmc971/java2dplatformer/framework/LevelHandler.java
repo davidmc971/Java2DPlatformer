@@ -10,7 +10,7 @@ import io.github.davidmc971.java2dplatformer.objects.Player;
 
 public class LevelHandler {
 	private BufferedImage level = null;
-	private Game game;
+	// private Game game;
 	private Handler handler;
 	private BufferedImageLoader loader;
 	private int numLevel = 0;
@@ -18,7 +18,7 @@ public class LevelHandler {
 	private boolean loading;
 	
 	public LevelHandler(Game game, Handler handler){
-		this.game = game;
+		// this.game = game;
 		this.handler = handler;
 		active = true;
 		loader = new BufferedImageLoader();

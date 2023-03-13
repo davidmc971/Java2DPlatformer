@@ -1,39 +1,36 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import static org.lwjgl.opengl.GL11.*;
-
-import java.nio.DoubleBuffer;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.objects.Player;
 
-import static org.lwjgl.glfw.GLFW.*;
 
 public class Camera {
 	private Matrix4f m4fProjection, m4fView;
-	private Vector3f v3fPosition, v3fRotation;
+	private Vector3f v3fPosition; //, v3fRotation;
 
 	public Camera(Vector3f position) {
 		this.v3fPosition = position;
-		this.v3fRotation = new Vector3f();
+		// this.v3fRotation = new Vector3f();
 		this.m4fProjection = new Matrix4f();
 		this.m4fView = new Matrix4f();
 	}
 
 	public void setupOrtho(float width, float height) {
 		m4fProjection.identity();
-		m4fProjection.ortho(0, width, height, 0, 0, 1000);
+		m4fProjection.ortho(0, width, height, 0, -1, 1000);
 	}
 
 	public Matrix4f getViewMatrix() {
-		Vector3f cameraFront = new Vector3f(0, 0, -1);
-		Vector3f cameraUp = new Vector3f(0, 1, 0);
+		// Vector3f cameraFront = new Vector3f(0, 0, -1);
+		// Vector3f cameraUp = new Vector3f(0, 1, 0);
+		// m4fView.identity();
+		// m4fView = m4fView.lookAt(new Vector3f(v3fPosition.x, v3fPosition.y, 20f),
+		// 		cameraFront.add(v3fPosition.x, v3fPosition.y, 0), cameraUp);
+
 		m4fView.identity();
-		m4fView = m4fView.lookAt(new Vector3f(v3fPosition.x, v3fPosition.y, 20f),
-				cameraFront.add(v3fPosition.x, v3fPosition.y, 0), cameraUp);
+		m4fView.translate(v3fPosition);
 		return m4fView;
 	}
 
@@ -166,17 +163,17 @@ public class Camera {
 	// private DoubleBuffer mouseXBuf = DoubleBuffer.allocate(2);
 	// private DoubleBuffer mouseYBuf = DoubleBuffer.allocate(2);
 
-	// public void tick(Player player) {
-	// if (player.getFocusCamera()) {
-	// this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2;
-	// this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2;
-	// } else {
-	// glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
-	// this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
-	// ((float) mouseXBuf.get()) - Game.WIDTH / 2;
-	// this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
-	// ((float) mouseYBuf.get()) + Game.HEIGHT / 2;
-	// }
-	// }
+	public void tick(Player player) {
+		if (player.getFocusCamera()) {
+			v3fPosition.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2;
+			v3fPosition.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2;
+		} // else {
+		// 	glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
+		// 	this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
+		// 			((float) mouseXBuf.get()) - Game.WIDTH / 2;
+		// 	this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
+		// 			((float) mouseYBuf.get()) + Game.HEIGHT / 2;
+		// }
+	}
 
 }

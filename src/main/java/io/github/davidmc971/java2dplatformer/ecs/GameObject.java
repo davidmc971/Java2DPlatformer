@@ -5,6 +5,7 @@ import java.util.List;
 
 public class GameObject {
   private String name;
+
   private List<Component> components = new ArrayList<>();
 
   public GameObject(String name) {
@@ -50,5 +51,9 @@ public class GameObject {
     for (int i = 0; i < components.size(); i++) {
       components.get(i).start();
     }
+  }
+  
+  public String getName() {
+    return name;
   }
 }

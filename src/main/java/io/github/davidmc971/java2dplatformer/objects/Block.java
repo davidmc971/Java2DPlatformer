@@ -5,58 +5,55 @@ import java.util.LinkedList;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
-import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
-import static org.lwjgl.opengl.GL11.*;
-
-public class Block extends io.github.davidmc971.java2dplatformer.framework.GameObject{
+public class Block extends io.github.davidmc971.java2dplatformer.framework.GameObject {
 
 	public Block(float x, float y, ObjectId id) {
 		super(x, y, id);
-		
 	}
 
 	public void tick(LinkedList<GameObject> object) {
-		
+
 	}
-	
-	public void render(){
-		if(this.getId() == ObjectId.Finish){
-			color3_255(255, 255, 255);
-			glRectf(x, y, x+16, y+16);
-			glRectf(x+16, y+16, x+32, y+32);
-			color3_255(20, 20, 20);
-			glRectf(x+16, y, x+32, y+16);
-			glRectf(x, y+16, x+16, y+32);
-		} else if(this.getId() == ObjectId.Death) {
-			color3_255(56,0,0);
-			glRectf(x, y, x+32, y+32);
-			color3_255(200,0,0);
-			glRectf(x+2, y+2, x+30, y+30);
-		} else if(this.getId() == ObjectId.Check){
-			color3_255(0,10,10);
-			glRectf(x, y, x+32, y+32);
-			color3_255(0,170,170);
-			glRectf(x+2, y+2, x+30, y+30);
-		} else if(this.getId() == ObjectId.Elevator){
-			color3_255(10,10,30);
-			glRectf(x, y, x+32, y+32);
-			color3_255(20,20,170);
-			glRectf(x+2, y+2, x+30, y+30);
-		} else if(this.getId() == ObjectId.Enemy){
-			color3_255(30,10,30);
-			glRectf(x, y, x+32, y+32);
-			color3_255(170,20,170);
-			glRectf(x+2, y+2, x+30, y+30);
+
+	public void render(Renderer renderer) {
+		if (this.getId() == ObjectId.Finish) {
+			renderer.drawQuad(position.x, position.y, position.z, 16, 16,
+					1, 1, 1, 1);
+			renderer.drawQuad(position.x + 16, position.y, position.z, 16, 16,
+					1, 1, 1, 1);
+			renderer.drawQuad(position.x, position.y + 16, position.z, 16, 16,
+					20f / 255f, 20f / 255f, 20f / 255f, 1);
+		} else if (this.getId() == ObjectId.Death) {
+			renderer.drawQuad(position.x, position.y, position.z, 32, 32,
+					56f / 255f, 0, 0, 1);
+			renderer.drawQuad(position.x + 2, position.y + 2, position.z, 28, 28,
+					200f / 255f, 0, 0, 1);
+		} else if (this.getId() == ObjectId.Check) {
+			renderer.drawQuad(position.x, position.y, position.z, 32, 32,
+					0, 10f / 255f, 10f / 255f, 1);
+			renderer.drawQuad(position.x + 2, position.y + 2, position.z, 28, 28,
+					0, 170f / 255f, 170f / 255f, 1);
+		} else if (this.getId() == ObjectId.Elevator) {
+			renderer.drawQuad(position.x, position.y, position.z, 32, 32,
+					10f / 255f, 10f / 255f, 30f / 255f, 1);
+			renderer.drawQuad(position.x + 2, position.y + 2, position.z, 28, 28,
+					20f / 255f, 20f / 255f, 170f / 255f, 1);
+		} else if (this.getId() == ObjectId.Enemy) {
+			renderer.drawQuad(position.x, position.y, position.z, 32, 32,
+					30f / 255f, 10f / 255f, 30f / 255f, 1);
+			renderer.drawQuad(position.x + 2, position.y + 2, position.z, 28, 28,
+					170f / 255f, 20f / 255f, 170f / 255f, 1);
 		} else {
-			color3_255(0,40,0);
-			glRectf(x, y, x+32, y+32);
-			color3_255(0,255,0);
-			glRectf(x+2, y+2, x+30, y+30);
+			renderer.drawQuad(position.x, position.y, position.z, 32, 32,
+					0f / 255f, 40f / 255f, 0f / 255f, 1);
+			renderer.drawQuad(position.x + 2, position.y + 2, position.z, 28, 28,
+					0f / 255f, 255f / 255f, 0f / 255f, 1);
 		}
 	}
 
 	public Rectangle getBounds() {
-		return new Rectangle((int)x, (int)y, 32, 32);
+		return new Rectangle((int) position.x, (int) position.y, 32, 32);
 	}
 }
