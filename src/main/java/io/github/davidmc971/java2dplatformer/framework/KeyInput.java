@@ -29,7 +29,7 @@ public class KeyInput extends Thread {
 					tempObject.setVelX(180f);
 				} else tempObject.setVelX(0);
 				if(glfwGetKey(this.window, GLFW_KEY_SPACE) == GLFW_PRESS && !tempObject.isJumping()){
-					tempObject.setVelY(-350f);
+					tempObject.setVelY(-400f);
 					tempObject.setJumping(true);
 				}
 				if(glfwGetMouseButton(this.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){

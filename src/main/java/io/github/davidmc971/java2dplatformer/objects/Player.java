@@ -40,10 +40,10 @@ public class Player extends GameObject {
 				velocity.y = MAX_SPEED;
 			}
 		}
-		collision(object);
+		collision(dt, object);
 	}
 
-	private void collision(LinkedList<GameObject> object) {
+	private void collision(float dt, LinkedList<GameObject> object) {
 		for (int i = 0; i < handler.object.size(); i++) {
 			GameObject tempObject = handler.object.get(i);
 			if (tempObject.getId() == ObjectId.Block) {
@@ -102,7 +102,7 @@ public class Player extends GameObject {
 						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setVelY(this.getVelY() - 18f);
+					this.setVelY(this.getVelY() - 400f * dt);
 				}
 
 			}

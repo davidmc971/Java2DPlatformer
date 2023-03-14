@@ -65,7 +65,7 @@ public class Game implements Runnable {
 			lastTime = now;
 			while (delta >= 1) {
 				// TODO: lerp based on interpolation
-				update(delta);
+				update(1f / amountOfTicks);
 				if (glfwWindowShouldClose(window))
 					running = false;
 				updates++;
@@ -85,7 +85,7 @@ public class Game implements Runnable {
 
 	protected void interpolationGameLoop() {
 		long lastTime = System.nanoTime();
-		double updatesPerSecond = 23.0f;
+		double updatesPerSecond = 41.0f;
 		double updateTimeStep = 1 / updatesPerSecond;
 
 		// At 165 Hz should end up as 0.00606060606061
