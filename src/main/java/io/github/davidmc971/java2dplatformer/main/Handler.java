@@ -20,7 +20,7 @@ public class Handler {
 		this.game = game;
 	}
 
-	public void tick(float dt) {
+	public void tick(float t, float dt) {
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 			tempObject.preUpdate();

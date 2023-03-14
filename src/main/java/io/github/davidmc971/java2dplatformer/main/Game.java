@@ -10,8 +10,6 @@ import org.lwjgl.opengl.GL;
 
 import io.github.davidmc971.java2dplatformer.framework.KeyInput;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
-import io.github.davidmc971.java2dplatformer.framework.ObjectId;
-import io.github.davidmc971.java2dplatformer.objects.Player;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Game implements Runnable {
@@ -26,6 +24,8 @@ public class Game implements Runnable {
 	private LevelHandler levelh;
 	private KeyInput keyInput;
 	private Camera cam;
+
+	public static final boolean DEBUG = true;
 
 	public synchronized void start(int w, int h, String title) {
 		if (running)
@@ -54,6 +54,7 @@ public class Game implements Runnable {
 	protected void legacyLoop() {
 		long lastTime = System.nanoTime();
 		double amountOfTicks = 60.0;
+		double totalUpdateTime = 0;
 		double ns = 1000000000 / amountOfTicks;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
@@ -64,8 +65,8 @@ public class Game implements Runnable {
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			while (delta >= 1) {
-				// TODO: lerp based on interpolation
-				update(1f / amountOfTicks);
+				totalUpdateTime += 1f / amountOfTicks;
+				update((float) totalUpdateTime, 1f / (float) amountOfTicks);
 				if (glfwWindowShouldClose(window))
 					running = false;
 				updates++;
@@ -85,22 +86,16 @@ public class Game implements Runnable {
 
 	protected void interpolationGameLoop() {
 		long lastTime = System.nanoTime();
-		double updatesPerSecond = 41.0f;
+		double updatesPerSecond = 50.0f;
 		double updateTimeStep = 1 / updatesPerSecond;
-
-		// At 165 Hz should end up as 0.00606060606061
 		double frameTime = 0;
-
 		long updateDisplayTimer = System.currentTimeMillis();
 		int lastUpdatesPerSecond = 0;
 		int lastFramesPerSecond = 0;
 		long now = 0;
 		double accumulator = 0;
-
 		double renderLerp = 0;
-
-		double totalSecondsUpdated = 0;
-
+		double updateTimeTotal = 0;
 		while (running) {
 			now = System.nanoTime();
 			frameTime = (now - lastTime) / 1_000_000_000d;
@@ -108,12 +103,12 @@ public class Game implements Runnable {
 			accumulator += frameTime;
 
 			while (accumulator >= updateTimeStep) {
-				update((float) updateTimeStep);
-				if (glfwWindowShouldClose(window))
-					running = false;
 				lastUpdatesPerSecond++;
 				accumulator -= updateTimeStep;
-				totalSecondsUpdated += updateTimeStep;
+				updateTimeTotal += updateTimeStep;
+				update((float) updateTimeTotal, (float) updateTimeStep);
+				if (glfwWindowShouldClose(window))
+					running = false;
 			}
 
 			renderLerp = accumulator / updateTimeStep;
@@ -187,7 +182,7 @@ public class Game implements Runnable {
 	private Scene mainScene = new Scene() {
 
 		@Override
-		public void update(float dt) {
+		public void update(float t, float dt) {
 			gameObjects.forEach((go) -> go.update(dt));
 		}
 
@@ -200,9 +195,9 @@ public class Game implements Runnable {
 		mainScene.start();
 	}
 
-	private void update(double dt) {
-		mainScene.update((float) dt);
-		handler.tick((float) dt);
+	private void update(float t, float dt) {
+		mainScene.update(t, dt);
+		handler.tick(t, dt);
 		keyInput.checkKeys();
 	}
 

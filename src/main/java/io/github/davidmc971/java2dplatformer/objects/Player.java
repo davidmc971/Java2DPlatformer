@@ -4,8 +4,11 @@ import java.awt.Rectangle;
 
 import java.util.LinkedList;
 
+import org.joml.Vector3f;
+
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
+import io.github.davidmc971.java2dplatformer.main.Game;
 import io.github.davidmc971.java2dplatformer.main.Handler;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
@@ -20,6 +23,7 @@ public class Player extends GameObject {
 
 	public Player(float x, float y, Handler handler, ObjectId id) {
 		super(x, y, id);
+		this.dimensions.set(width, height, 0);
 		this.handler = handler;
 		this.checkX = getX();
 		this.checkY = getY();
@@ -52,6 +56,7 @@ public class Player extends GameObject {
 					velocity.y = 0;
 					falling = false;
 					jumping = false;
+					position.y = (int) position.y;
 				} else {
 					falling = true;
 				}
@@ -110,14 +115,18 @@ public class Player extends GameObject {
 	}
 
 	public void render(Renderer renderer) {
-		renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, width, height,
+		renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, dimensions.x,
+				dimensions.y,
 				200f / 255f, 100f / 255f, 0f / 255f, 127);
-		if (false)
-			for (int i = 0; i < getBoundsAll().length; i++) {
-				Rectangle r = getBoundsAll()[i];
+		if (Game.DEBUG) {
+			Rectangle[] bounds = getBoundsAll(interpolatedPosition);
+			for (int i = 0; i < bounds.length; i++) {
+				Rectangle r = bounds[i];
 				renderer.drawQuad(r.x, r.y, 0, r.width, r.height,
 						(float) (255 / 4 * (i + 1)) / 255f, 255f / 255f, (float) (255 / (i + 1)) / 255f, 1);
 			}
+			renderer.drawQuad(bounds[0].x, bounds[0].y, 0, bounds[0].width, bounds[0].height, 1, 1, 1, 1);
+		}
 	}
 
 	public Rectangle getBounds() {
@@ -125,9 +134,13 @@ public class Player extends GameObject {
 	}
 
 	public Rectangle[] getBoundsAll() {
+		return getBoundsAll(position);
+	}
+
+	public Rectangle[] getBoundsAll(Vector3f position) {
 		return new Rectangle[] {
 				new Rectangle((int) (position.x + width / 4), (int) (position.y + height / 2), (int) width / 2,
-						(int) height / 2), // Bottom
+						(int) height / 2 + 1), // Bottom
 				new Rectangle((int) (position.x + width / 4), (int) position.y, (int) width / 2, (int) height / 2), // Top
 				new Rectangle((int) (position.x + width - width / 4), (int) (position.y + 4), (int) width / 4,
 						(int) (height - 8)), // Right

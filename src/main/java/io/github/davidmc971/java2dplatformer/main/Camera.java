@@ -5,14 +5,12 @@ import org.joml.Vector3f;
 
 import io.github.davidmc971.java2dplatformer.objects.Player;
 
-
 public class Camera {
 	private Matrix4f m4fProjection, m4fView;
-	private Vector3f v3fPosition; //, v3fRotation;
+	private Vector3f v3fPosition;
 
 	public Camera(Vector3f position) {
 		this.v3fPosition = position;
-		// this.v3fRotation = new Vector3f();
 		this.m4fProjection = new Matrix4f();
 		this.m4fView = new Matrix4f();
 	}
@@ -27,7 +25,7 @@ public class Camera {
 		// Vector3f cameraUp = new Vector3f(0, 1, 0);
 		// m4fView.identity();
 		// m4fView = m4fView.lookAt(new Vector3f(v3fPosition.x, v3fPosition.y, 20f),
-		// 		cameraFront.add(v3fPosition.x, v3fPosition.y, 0), cameraUp);
+		// cameraFront.add(v3fPosition.x, v3fPosition.y, 0), cameraUp);
 
 		m4fView.identity();
 		m4fView.translate(v3fPosition);
@@ -165,14 +163,14 @@ public class Camera {
 
 	public void tick(Player player) {
 		if (player.getFocusCamera()) {
-			v3fPosition.x = -((int)player.getInterpolatedPosition().x) + Game.WIDTH / 2 - player.getBounds().width / 2;
-			v3fPosition.y = -((int)player.getInterpolatedPosition().y) + Game.HEIGHT / 2 - player.getBounds().height / 2;
+			v3fPosition.x = -(player.getInterpolatedPosition().x) + (float) Game.WIDTH / 2f - player.getDimensions().x / 2f;
+			v3fPosition.y = -(player.getInterpolatedPosition().y) + (float) Game.HEIGHT / 2f - player.getDimensions().y / 2f;
 		} // else {
-		// 	glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
-		// 	this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
-		// 			((float) mouseXBuf.get()) - Game.WIDTH / 2;
-		// 	this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
-		// 			((float) mouseYBuf.get()) + Game.HEIGHT / 2;
+		// glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
+		// this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
+		// ((float) mouseXBuf.get()) - Game.WIDTH / 2;
+		// this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
+		// ((float) mouseYBuf.get()) + Game.HEIGHT / 2;
 		// }
 	}
 
