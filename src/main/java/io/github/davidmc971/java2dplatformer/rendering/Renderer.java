@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
+import io.github.davidmc971.java2dplatformer.main.AssetManager;
 import io.github.davidmc971.java2dplatformer.main.Camera;
 import io.github.davidmc971.java2dplatformer.rendering.ShaderType.CouldNotInferShaderTypeException;
 
@@ -41,8 +42,8 @@ public class Renderer {
     this.camera = camera;
     shaderProgram = new ShaderProgram();
     try {
-      shaderProgram.attachShader(Shader.loadInternal("/shaders/main.vert"));
-      shaderProgram.attachShader(Shader.loadInternal("/shaders/main.frag"));
+      shaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/main.vert"));
+      shaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/main.frag"));
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -50,9 +51,10 @@ public class Renderer {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+
     shaderProgram.link();
 
-    testTexture = Texture.loadInternal("/img/textures/Sprite-0001.png");
+    testTexture = AssetManager.getTextureInternal("/img/textures/Sprite-0001.png");
 
     uLocModel = shaderProgram.getUniformLocation("model");
     uLocView = shaderProgram.getUniformLocation("view");
@@ -150,10 +152,10 @@ public class Renderer {
     vertexBuffer.put(x).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
         .put(0).put(1);
-        vertexBuffer.put(x + w).put(y + h).put(z)
+    vertexBuffer.put(x + w).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
         .put(1).put(1);
-        vertexBuffer.put(x).put(y).put(z)
+    vertexBuffer.put(x).put(y).put(z)
         .put(r).put(g).put(b).put(a)
         .put(0).put(0);
 
