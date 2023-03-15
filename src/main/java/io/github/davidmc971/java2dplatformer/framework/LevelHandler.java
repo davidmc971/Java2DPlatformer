@@ -2,6 +2,11 @@ package io.github.davidmc971.java2dplatformer.framework;
 
 import java.awt.image.BufferedImage;
 
+import com.badlogic.ashley.core.PooledEngine;
+
+import io.github.davidmc971.java2dplatformer.ecs.ECSEngine;
+import io.github.davidmc971.java2dplatformer.ecs.GameObject;
+import io.github.davidmc971.java2dplatformer.ecs.components.TestComponent;
 import io.github.davidmc971.java2dplatformer.graphics.BufferedImageLoader;
 import io.github.davidmc971.java2dplatformer.main.Game;
 import io.github.davidmc971.java2dplatformer.main.Handler;
@@ -10,15 +15,15 @@ import io.github.davidmc971.java2dplatformer.objects.Player;
 
 public class LevelHandler {
 	private BufferedImage level = null;
-	// private Game game;
 	private Handler handler;
 	private BufferedImageLoader loader;
 	private int numLevel = 0;
 	private boolean active;
 	private boolean loading;
+	private ECSEngine ecsEngine;
 
-	public LevelHandler(Game game, Handler handler) {
-		// this.game = game;
+	public LevelHandler(Handler handler, ECSEngine ecsEngine, PooledEngine ashleyECSPooledEngine) {
+		this.ecsEngine = ecsEngine;
 		this.handler = handler;
 		active = true;
 		loader = new BufferedImageLoader();
@@ -71,10 +76,16 @@ public class LevelHandler {
 
 				if (red == 0 && green == 0 && blue == 0) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Block));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} else if (red == 150 && green == 150 && blue == 150) {
 					// handler.addObject(new Player(i*32, j*32, handler, ObjectId.Player));
 				} else if (red == 0 && green == 255 && blue == 0) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Finish));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} /*
 					 * else if(red == 0 && green == 255 && blue == 255){
 					 * handler.addObject(new BGBlock(i*32, j*32, red, green, blue));
@@ -85,14 +96,29 @@ public class LevelHandler {
 					 * }
 					 */ else if (red == 255 && green == 0 && blue == 0) {
 					handler.addObject(new Player(i * 32, j * 32, handler, ObjectId.Player));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} else if (red == 255 && green == 255 && blue == 0) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Death));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} else if (red == 0 && green == 255 && blue == 255) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Check));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} else if (red == 0 && green == 0 && blue == 255) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Elevator));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				} else if (red == 255 && green == 0 && blue == 255) {
 					handler.addObject(new Block(i * 32, j * 32, ObjectId.Enemy));
+					ecsEngine.addEntity(
+							new GameObject()
+									.addComponent(new TestComponent()));
 				}
 
 			}

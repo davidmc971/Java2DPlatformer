@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
+		id 'java'
     id 'application'
 		id "com.github.johnrengelman.shadow" version "8.1.0"
 }
@@ -28,6 +29,8 @@ switch (OperatingSystem.current()) {
 
 repositories {
 	mavenCentral()
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+	maven { url "https://oss.sonatype.org/content/repositories/releases/" }
 }
 
 // project.ext.lwjglNatives = "natives-windows-x86"
@@ -68,6 +71,8 @@ dependencies {
 	if (lwjglNatives == "natives-macos" || lwjglNatives == "natives-macos-arm64") runtimeOnly "org.lwjgl:lwjgl-vulkan::$lwjglNatives"
 
 	implementation "org.joml:joml:${jomlVersion}"
+
+	implementation "com.badlogicgames.ashley:ashley:1.7.3"
 }
 
 application {

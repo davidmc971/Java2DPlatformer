@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameObject {
-  private String name;
+  private static long ENTITY_ID_COUNTER = 0;
+
+  private long entityId = ENTITY_ID_COUNTER++;
 
   private List<Component> components = new ArrayList<>();
-
-  public GameObject(String name) {
-    this.name = name;
-  }
 
   public <T extends Component> T getComponent(Class<T> componentClass) {
     for (Component c : components) {
@@ -26,6 +24,10 @@ public class GameObject {
     return null;
   }
 
+  public List<Component> getComponents() {
+    return components;
+  }
+
   public <T extends Component> void removeComponent(Class<T> componentClass) {
     for (int i = 0; i < components.size(); i++) {
       Component c = components.get(i);
@@ -36,14 +38,15 @@ public class GameObject {
     }
   }
 
-  public void addComponent(Component c) {
+  public GameObject addComponent(Component c) {
     components.add(c);
     c.gameObject = this;
+    return this;
   }
 
-  public void update(float dt) {
+  public void update(float t, float dt) {
     for (int i = 0; i < components.size(); i++) {
-      components.get(i).update(dt);
+      components.get(i).update(t, dt);
     }
   }
 
@@ -52,8 +55,8 @@ public class GameObject {
       components.get(i).start();
     }
   }
-  
-  public String getName() {
-    return name;
+
+  public long getEntityId() {
+    return entityId;
   }
 }

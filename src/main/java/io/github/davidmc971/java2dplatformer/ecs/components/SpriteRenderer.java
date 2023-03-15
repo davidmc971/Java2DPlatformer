@@ -1,4 +1,4 @@
-package io.github.davidmc971.java2dplatformer.components;
+package io.github.davidmc971.java2dplatformer.ecs.components;
 
 import io.github.davidmc971.java2dplatformer.ecs.Component;
 
@@ -11,7 +11,7 @@ public class SpriteRenderer extends Component {
   }
 
   @Override
-  public void update(float dt) {
+  public void update(float t, float dt) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'update'");
   }

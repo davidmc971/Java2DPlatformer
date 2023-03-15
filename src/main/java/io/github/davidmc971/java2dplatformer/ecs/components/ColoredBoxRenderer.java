@@ -1,4 +1,4 @@
-package io.github.davidmc971.java2dplatformer.components;
+package io.github.davidmc971.java2dplatformer.ecs.components;
 
 import org.joml.Vector4f;
 
@@ -20,7 +20,7 @@ public class ColoredBoxRenderer extends Component {
   private boolean temp = false;
 
   @Override
-  public void update(float dt) {
+  public void update(float t, float dt) {
     if (!temp) {
       System.out.println("Component updating");
       temp = true;

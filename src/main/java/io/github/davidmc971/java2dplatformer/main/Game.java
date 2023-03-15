@@ -4,10 +4,18 @@ import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import java.util.List;
+
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
+
+import io.github.davidmc971.java2dplatformer.ecs.ECSEngine;
+import io.github.davidmc971.java2dplatformer.ecs.EntitySystem;
+import io.github.davidmc971.java2dplatformer.ecs.components.TestComponent;
 import io.github.davidmc971.java2dplatformer.framework.KeyInput;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
@@ -26,7 +34,7 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean VSYNC = true;
+	public static final boolean VSYNC = false;
 	public static final boolean DEBUG = true;
 
 	public synchronized void start(int w, int h, String title) {
@@ -149,6 +157,9 @@ public class Game implements Runnable {
 		return window;
 	}
 
+	private ECSEngine ecsEngine;
+	private PooledEngine ashleyECSPooledEngine;
+
 	private void init() {
 		glfwInit();
 		// Setup an error callback to print GLFW errors to the console.
@@ -173,8 +184,32 @@ public class Game implements Runnable {
 
 		glfwShowWindow(window);
 
-		handler = new Handler(this);
-		levelh = new LevelHandler(this, handler);
+		ecsEngine = new ECSEngine();
+
+		ashleyECSPooledEngine = new PooledEngine(2048, Integer.MAX_VALUE, 65536, Integer.MAX_VALUE);
+
+		Entity entity = ashleyECSPooledEngine.createEntity();
+		entity.add(ashleyECSPooledEngine.createComponent(io.github.davidmc971.java2dplatformer.ashley.components.TestComponent.class));
+		ashleyECSPooledEngine.addEntity(entity);
+
+		ecsEngine.addEntitySystem(new EntitySystem() {
+
+			@Override
+			public void initialize() {
+				
+			}
+
+			@Override
+			public void update(float t, float dt) {
+				
+				if (Math.floor(t / dt) % 50 == 0)
+					System.out.println("ECS contains " + ecsEngine.getComponents(TestComponent.class).size() + " TestComponent instances.");
+			}
+
+		});
+
+		handler = new Handler(this, ecsEngine, ashleyECSPooledEngine);
+		levelh = new LevelHandler(handler, ecsEngine, ashleyECSPooledEngine);
 
 		levelh.loadLevel(1);
 
@@ -197,19 +232,19 @@ public class Game implements Runnable {
 
 		@Override
 		public void update(float t, float dt) {
-			gameObjects.forEach((go) -> go.update(dt));
+			gameObjects.forEach((go) -> go.update(t, dt));
 		}
 
 	};
 
 	private void initScene() {
-		io.github.davidmc971.java2dplatformer.ecs.GameObject testObject = new io.github.davidmc971.java2dplatformer.ecs.GameObject(
-				"test");
+		io.github.davidmc971.java2dplatformer.ecs.GameObject testObject = new io.github.davidmc971.java2dplatformer.ecs.GameObject();
 		mainScene.addGameObject(testObject);
 		mainScene.start();
 	}
 
 	private void update(float t, float dt) {
+		ecsEngine.update(t, dt);
 		mainScene.update(t, dt);
 		handler.tick(t, dt);
 		keyInput.checkKeys();
