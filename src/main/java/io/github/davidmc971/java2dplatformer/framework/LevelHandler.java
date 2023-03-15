@@ -31,6 +31,7 @@ public class LevelHandler {
 			level = loader.loadImage("/img/levels/level"+numLevel+".png");
 			loadImageLevel(level);
 		} catch(Exception e){
+			e.printStackTrace();
 			System.out.println("Level existiert nicht.");
 			return false;
 		}
@@ -49,8 +50,8 @@ public class LevelHandler {
 		int w = image.getWidth();
 		int h = image.getHeight();
 		
-		for(int i = 0; i < h; i++){
-			for(int j = 0; j < w; j++){
+		for(int i = 0; i < w; i++){
+			for(int j = 0; j < h; j++){
 				int pixel = image.getRGB(i, j);
 				int red = (pixel >> 16) & 0xff;
 				int green = (pixel >> 8) & 0xff;
@@ -91,6 +92,10 @@ public class LevelHandler {
 				
 			}
 		}
+	}
+
+	public boolean isLoading() {
+		return loading;
 	}
 
 	public boolean nextLevel() {

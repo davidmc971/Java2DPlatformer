@@ -21,6 +21,7 @@ public class Handler {
 	}
 
 	public void tick(float t, float dt) {
+		if (!game.getLevelHandler().isActive() || game.getLevelHandler().isLoading()) return;
 		for (int i = 0; i < object.size(); i++) {
 			tempObject = object.get(i);
 			tempObject.preUpdate();
