@@ -15,9 +15,22 @@ public class Camera {
 		this.m4fView = new Matrix4f();
 	}
 
+	private float l, r, b, t, zoom = 1.5f, zfW, zfH;
+
 	public void setupOrtho(float width, float height) {
 		m4fProjection.identity();
-		m4fProjection.ortho(0, width, height, 0, -1, 1000);
+		zfW = width - width / zoom;
+		zfH = height - height / zoom;
+		// Zoom 1 | Zoom 1.5
+		// 1280 -> 0 | 1280 -> 320
+		l = 0 + zfW / 2f;
+		// 1280 -> 1280 | 1280 -> 960
+		r = width - zfW / 2f;
+		// 1280 -> 0 | 1280 -> 320
+		b = height - zfH / 2f;
+		// 1280 -> 0 | 1280 -> 320
+		t = 0 + zfH / 2f;
+		m4fProjection.ortho(l, r, b, t, -1, 1000);
 	}
 
 	public Matrix4f getViewMatrix() {

@@ -9,6 +9,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -54,7 +55,7 @@ public class Renderer {
 
     shaderProgram.link();
 
-    testTexture = AssetManager.getTextureInternal("/img/textures/Sprite-0001.png");
+    testTexture = AssetManager.getTextureInternal("/img/textures/Brick-01.png");
 
     uLocModel = shaderProgram.getUniformLocation("model");
     uLocView = shaderProgram.getUniformLocation("view");
@@ -97,8 +98,8 @@ public class Renderer {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     GL20.glUseProgram(shaderProgram.programId);
 
-    testTexture.bind();
-    shaderProgram.sendTextureUniform("textureSampler", 0);
+    testTexture.bind(GL13.GL_TEXTURE1);
+    shaderProgram.sendTextureUniform("textureSampler", 1);
 
     GL30.glBindVertexArray(vao);
 

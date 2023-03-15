@@ -68,13 +68,17 @@ public class Texture implements Disposable {
     return new Texture(image, width, height, channels);
   }
 
-  public void bind() {
-    GL13.glActiveTexture(GL13.GL_TEXTURE0);
+  public void bind(int glTextureSlot) {
+    GL13.glActiveTexture(glTextureSlot);
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
   }
 
   public void unbind() {
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+  }
+
+  public static int getMaxTextureSlots() {
+    return GL11.glGetInteger(GL13.GL_MAX_TEXTURE_UNITS);
   }
 
   @Override

@@ -14,7 +14,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Player extends GameObject {
 
-	private float width = 32, height = 64;
+	private float width = 24, height = 48;
 	private float gravity = 700f;
 	private final float MAX_SPEED = 750;
 	private Handler handler;
@@ -52,7 +52,7 @@ public class Player extends GameObject {
 			GameObject tempObject = handler.object.get(i);
 			if (tempObject.getId() == ObjectId.Block) {
 				if (getBoundsAll()[0].intersects(tempObject.getBounds())) {
-					position.y = tempObject.getY() - height;
+					position.y = tempObject.getY() - dimensions.y;
 					velocity.y = 0;
 					falling = false;
 					jumping = false;
@@ -61,14 +61,14 @@ public class Player extends GameObject {
 					falling = true;
 				}
 				if (getBoundsAll()[1].intersects(tempObject.getBounds())) {
-					position.y = tempObject.getY() + tempObject.getBounds().height;
+					position.y = tempObject.getY() + tempObject.getHeight();
 					velocity.y = 0;
 				}
 				if (getBoundsAll()[2].intersects(tempObject.getBounds())) {
-					position.x = tempObject.getX() - tempObject.getBounds().width;
+					position.x = tempObject.getX() - dimensions.x;
 				}
 				if (getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					position.x = tempObject.getX() + tempObject.getBounds().width;
+					position.x = tempObject.getX() + tempObject.getWidth();
 				}
 			}
 			if (tempObject.getId() == ObjectId.Death) {
@@ -107,9 +107,8 @@ public class Player extends GameObject {
 						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setVelY(this.getVelY() - 400f * dt);
+					this.setVelY(this.getVelY() - 450f * dt);
 				}
-
 			}
 		}
 	}

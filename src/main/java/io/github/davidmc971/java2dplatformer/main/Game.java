@@ -25,7 +25,8 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean DEBUG = false;
+	public static final boolean VSYNC = false;
+	public static final boolean DEBUG = true;
 
 	public synchronized void start(int w, int h, String title) {
 		if (running)
@@ -155,7 +156,7 @@ public class Game implements Runnable {
 
 		// Make this window's context the current on this thread.
 		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
+		glfwSwapInterval(VSYNC ? 1 : 0);
 
 		glfwShowWindow(window);
 
