@@ -26,7 +26,7 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean VSYNC = false;
+	public static final boolean VSYNC = true;
 	public static final boolean DEBUG = true;
 
 	public synchronized void start(int w, int h, String title) {
@@ -93,7 +93,10 @@ public class Game implements Runnable {
 
 	protected void interpolationGameLoop() {
 		long lastTime = System.nanoTime();
-		double updatesPerSecond = 50.0f;
+		double maxFramesPerSecond = 300;
+		double minFrameTime = 1 / maxFramesPerSecond;
+		double frameTimeAccumulator = 0;
+		double updatesPerSecond = 50;
 		double updateTimeStep = 1 / updatesPerSecond;
 		double frameTime = 0;
 		long updateDisplayTimer = System.currentTimeMillis();
@@ -108,6 +111,7 @@ public class Game implements Runnable {
 			frameTime = (now - lastTime) / 1_000_000_000d;
 			lastTime = now;
 			accumulator += frameTime;
+			frameTimeAccumulator += frameTime;
 
 			while (accumulator >= updateTimeStep) {
 				lastUpdatesPerSecond++;
@@ -121,8 +125,11 @@ public class Game implements Runnable {
 			renderLerp = accumulator / updateTimeStep;
 			renderLerp = Math.max(Math.min(renderLerp, 1.0d), 0.0d);
 
-			render((float) renderLerp);
-			lastFramesPerSecond++;
+			if (frameTimeAccumulator >= minFrameTime) {
+				render((float) renderLerp);
+				frameTimeAccumulator -= minFrameTime;
+				lastFramesPerSecond++;
+			}
 
 			if (System.currentTimeMillis() - updateDisplayTimer > 1000) {
 				updateDisplayTimer += 1000;
