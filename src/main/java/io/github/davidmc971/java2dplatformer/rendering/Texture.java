@@ -32,6 +32,10 @@ public class Texture implements Disposable {
     this.height = height;
     this.channels = channels;
 
+    System.out.println("Creating Texture instance with width and height of "
+        + width.get(0) + "x" + height.get(0)
+        + " and " + channels.get(0) + " color channels.");
+
     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA,
         width.get(0), height.get(0), 0, GL11.GL_RGBA,
         GL11.GL_UNSIGNED_BYTE, image);
@@ -59,7 +63,7 @@ public class Texture implements Disposable {
     IntBuffer height = BufferUtils.createIntBuffer(1);
     IntBuffer channels = BufferUtils.createIntBuffer(1);
     ByteBuffer rawImageDataBuffer = BufferUtils.createByteBuffer(rawImageData.length);
-    rawImageDataBuffer.put(rawImageData);
+    rawImageDataBuffer.put(rawImageData).flip();
     ByteBuffer image = org.lwjgl.stb.STBImage.stbi_load_from_memory(rawImageDataBuffer, width, height, channels, 0);
     return new Texture(image, width, height, channels);
   }

@@ -27,28 +27,18 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 					20f / 255f, 20f / 255f, 20f / 255f, 1);
 		} else if (this.getId() == ObjectId.Death) {
 			renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-					56f / 255f, 0, 0, 1);
-			renderer.drawQuad(interpolatedPosition.x + 2, interpolatedPosition.y + 2, interpolatedPosition.z, 28, 28,
 					200f / 255f, 0, 0, 1);
 		} else if (this.getId() == ObjectId.Check) {
 			renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-					0, 10f / 255f, 10f / 255f, 1);
-			renderer.drawQuad(interpolatedPosition.x + 2, interpolatedPosition.y + 2, interpolatedPosition.z, 28, 28,
 					0, 170f / 255f, 170f / 255f, 1);
 		} else if (this.getId() == ObjectId.Elevator) {
 			renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-					10f / 255f, 10f / 255f, 30f / 255f, 1);
-			renderer.drawQuad(interpolatedPosition.x + 2, interpolatedPosition.y + 2, interpolatedPosition.z, 28, 28,
 					20f / 255f, 20f / 255f, 170f / 255f, 1);
 		} else if (this.getId() == ObjectId.Enemy) {
 			renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-					30f / 255f, 10f / 255f, 30f / 255f, 1);
-			renderer.drawQuad(interpolatedPosition.x + 2, interpolatedPosition.y + 2, interpolatedPosition.z, 28, 28,
 					170f / 255f, 20f / 255f, 170f / 255f, 1);
 		} else {
 			renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-					0f / 255f, 40f / 255f, 0f / 255f, 1);
-			renderer.drawQuad(interpolatedPosition.x + 2, interpolatedPosition.y + 2, interpolatedPosition.z, 28, 28,
 					0f / 255f, 255f / 255f, 0f / 255f, 1);
 		}
 	}

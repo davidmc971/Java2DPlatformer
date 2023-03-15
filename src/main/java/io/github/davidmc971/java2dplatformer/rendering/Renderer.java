@@ -146,16 +146,16 @@ public class Renderer {
 
     vertexBuffer.put(x + w).put(y).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(0).put(1);
+        .put(1).put(0);
     vertexBuffer.put(x).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(1).put(1);
+        .put(0).put(1);
         vertexBuffer.put(x + w).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(1).put(0);
+        .put(1).put(1);
         vertexBuffer.put(x).put(y).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(0).put(1);
+        .put(0).put(0);
 
     elementBuffer.put(2 + batchElementOffset).put(1 + batchElementOffset).put(0 + batchElementOffset);
     elementBuffer.put(0 + batchElementOffset).put(1 + batchElementOffset).put(3 + batchElementOffset);

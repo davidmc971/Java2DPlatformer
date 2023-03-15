@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL;
 import io.github.davidmc971.java2dplatformer.framework.KeyInput;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
-import io.github.davidmc971.java2dplatformer.rendering.Texture;
 
 public class Game implements Runnable {
 	public static int WIDTH, HEIGHT;
@@ -26,7 +25,7 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	public synchronized void start(int w, int h, String title) {
 		if (running)
