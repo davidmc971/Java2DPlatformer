@@ -16,7 +16,7 @@ public class Player extends GameObject {
 
 	private float width = 24, height = 48;
 	private float gravity = 700f;
-	private final float MAX_SPEED = 750;
+	private final float MAX_SPEED = 600;
 	private Handler handler;
 	private float checkX, checkY;
 	private boolean cameraFocus = true;
@@ -40,16 +40,16 @@ public class Player extends GameObject {
 			if (velocity.y >= 0) {
 				velocity.y *= 1 + (0.15f * dt);
 			}
-			if (Math.abs(velocity.y) > MAX_SPEED) {
-				velocity.y = MAX_SPEED;
+			if (velocity.y != 0 && Math.abs(velocity.y) > MAX_SPEED) {
+				velocity.y = MAX_SPEED * (velocity.y / Math.abs(velocity.y));
 			}
 		}
 		collision(dt, object);
 	}
 
 	private void collision(float dt, LinkedList<GameObject> object) {
-		for (int i = 0; i < handler.object.size(); i++) {
-			GameObject tempObject = handler.object.get(i);
+		for (int i = 0; i < handler.objects.size(); i++) {
+			GameObject tempObject = handler.objects.get(i);
 			if (tempObject.getId() == ObjectId.Block) {
 				if (getBoundsAll()[0].intersects(tempObject.getBounds())) {
 					position.y = tempObject.getY() - dimensions.y;
@@ -95,8 +95,7 @@ public class Player extends GameObject {
 						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
 						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					if (handler.getLevelHandler().isActive()) {
-						handler.getLevelHandler().setActive(false);
+					if (handler.getLevelHandler().isActive() && !handler.getLevelHandler().isLoading()) {
 						System.out.println("Starting next level!");
 						handler.getLevelHandler().nextLevel();
 					}
