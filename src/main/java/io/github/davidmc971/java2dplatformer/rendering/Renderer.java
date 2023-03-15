@@ -33,6 +33,8 @@ public class Renderer {
   private Camera camera;
   private Matrix4f m4fModel = new Matrix4f();
 
+  private Texture testTexture;
+
   private static final int RENDER_BATCH_QUAD_AMOUNT = 2048;
 
   public void initialize(Camera camera) {
@@ -50,6 +52,8 @@ public class Renderer {
     }
     shaderProgram.link();
 
+    testTexture = Texture.loadInternal("/img/textures/Sprite-0001.png");
+
     uLocModel = shaderProgram.getUniformLocation("model");
     uLocView = shaderProgram.getUniformLocation("view");
     uLocProjection = shaderProgram.getUniformLocation("projection");
@@ -57,7 +61,7 @@ public class Renderer {
     vao = GL30.glGenVertexArrays();
     GL30.glBindVertexArray(vao);
 
-    vertexBuffer = BufferUtils.createFloatBuffer(7 * 4 * RENDER_BATCH_QUAD_AMOUNT);
+    vertexBuffer = BufferUtils.createFloatBuffer(9 * 4 * RENDER_BATCH_QUAD_AMOUNT);
     elementBuffer = BufferUtils.createIntBuffer(6 * RENDER_BATCH_QUAD_AMOUNT);
 
     vbo = GL15.glGenBuffers();
@@ -70,12 +74,17 @@ public class Renderer {
 
     int positionsSize = 3;
     int colorSize = 4;
-    int vertexSizeBytes = (positionsSize + colorSize) * Float.BYTES;
+    int uvSize = 2;
+    int vertexSizeBytes = (positionsSize + colorSize + uvSize) * Float.BYTES;
     GL20.glVertexAttribPointer(0, positionsSize, GL11.GL_FLOAT, false, vertexSizeBytes, 0);
     GL20.glEnableVertexAttribArray(0);
 
     GL20.glVertexAttribPointer(1, colorSize, GL11.GL_FLOAT, false, vertexSizeBytes, positionsSize * Float.BYTES);
     GL20.glEnableVertexAttribArray(1);
+
+    GL20.glVertexAttribPointer(2, uvSize, GL11.GL_FLOAT, false, vertexSizeBytes,
+        (positionsSize + colorSize) * Float.BYTES);
+    GL20.glEnableVertexAttribArray(2);
 
     fbProjectionMatrix = MemoryUtil.memAllocFloat(16);
     fbViewMatrix = MemoryUtil.memAllocFloat(16);
@@ -85,10 +94,15 @@ public class Renderer {
   public void preFrame() {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     GL20.glUseProgram(shaderProgram.programId);
+
+    testTexture.bind();
+    shaderProgram.sendTextureUniform("textureSampler", 0);
+
     GL30.glBindVertexArray(vao);
 
     GL20.glEnableVertexAttribArray(0);
     GL20.glEnableVertexAttribArray(1);
+    GL20.glEnableVertexAttribArray(2);
 
     m4fModel.identity();
     GL20.glUniformMatrix4fv(uLocProjection, false, camera.getProjectionMatrix().get(fbProjectionMatrix));
@@ -99,6 +113,9 @@ public class Renderer {
   public void postFrame() {
     GL20.glDisableVertexAttribArray(0);
     GL20.glDisableVertexAttribArray(1);
+    GL20.glDisableVertexAttribArray(2);
+
+    testTexture.unbind();
 
     GL30.glBindVertexArray(0);
     GL20.glUseProgram(0);
@@ -128,13 +145,17 @@ public class Renderer {
       flush();
 
     vertexBuffer.put(x + w).put(y).put(z)
-        .put(r).put(g).put(b).put(a);
+        .put(r).put(g).put(b).put(a)
+        .put(0).put(1);
     vertexBuffer.put(x).put(y + h).put(z)
-        .put(r).put(g).put(b).put(a);
-    vertexBuffer.put(x + w).put(y + h).put(z)
-        .put(r).put(g).put(b).put(a);
-    vertexBuffer.put(x).put(y).put(z)
-        .put(r).put(g).put(b).put(a);
+        .put(r).put(g).put(b).put(a)
+        .put(1).put(1);
+        vertexBuffer.put(x + w).put(y + h).put(z)
+        .put(r).put(g).put(b).put(a)
+        .put(1).put(0);
+        vertexBuffer.put(x).put(y).put(z)
+        .put(r).put(g).put(b).put(a)
+        .put(0).put(1);
 
     elementBuffer.put(2 + batchElementOffset).put(1 + batchElementOffset).put(0 + batchElementOffset);
     elementBuffer.put(0 + batchElementOffset).put(1 + batchElementOffset).put(3 + batchElementOffset);
@@ -143,10 +164,10 @@ public class Renderer {
 
   private float[] vertexArray = {
       // position // color // uv
-      740, 260, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // 1, 0, // 0
-      540, 460, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // 0, 1, // 1
-      740, 460, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 1, 1, // 2
-      540, 260, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f // , 1, 0 // 3
+      740, 260, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // 0
+      540, 460, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // 1
+      740, 460, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1, 1, // 2
+      540, 260, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0 // 3
   };
 
   // counterclockwise

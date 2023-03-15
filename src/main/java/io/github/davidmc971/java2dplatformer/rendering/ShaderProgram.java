@@ -35,6 +35,15 @@ public class ShaderProgram {
     return location;
   }
 
+  public void sendTextureUniform(String uniformName, int textureSlot) {
+    use();
+    GL20.glUniform1i(GL20.glGetUniformLocation(programId, uniformName), textureSlot);
+  }
+
+  public void use() {
+    GL20.glUseProgram(programId);
+  }
+
   @Override
   protected void finalize() {
     // TODO: no OpenGL context here, find alternative
