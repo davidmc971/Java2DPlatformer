@@ -7,6 +7,8 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL45;
 
 import io.github.davidmc971.java2dplatformer.main.Disposable;
 
@@ -73,12 +75,24 @@ public class Texture implements Disposable {
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
   }
 
+  public void bindToTextureUnit(int slot) {
+    GL45.glBindTextureUnit(slot, textureId);
+  }
+
   public void unbind() {
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
   }
 
   public static int getMaxTextureSlots() {
     return GL11.glGetInteger(GL13.GL_MAX_TEXTURE_UNITS);
+  }
+
+  public static int getMaxTextureSize() {
+    return GL11.glGetInteger(GL13.GL_MAX_TEXTURE_SIZE);
+  }
+
+  public static int getMaxTextureArrayLayers() {
+    return GL11.glGetInteger(GL30.GL_MAX_ARRAY_TEXTURE_LAYERS);
   }
 
   @Override

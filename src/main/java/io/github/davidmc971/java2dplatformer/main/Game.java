@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL;
 import io.github.davidmc971.java2dplatformer.framework.KeyInput;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
+import io.github.davidmc971.java2dplatformer.rendering.Texture;
 
 public class Game implements Runnable {
 	public static int WIDTH, HEIGHT;
@@ -47,6 +48,11 @@ public class Game implements Runnable {
 	public void run() {
 		init();
 		initGL();
+
+		System.out.println("Max texture slots: " + Texture.getMaxTextureSlots());
+		System.out.println("Max texture size: " + Texture.getMaxTextureSize());
+		System.out.println("Max texture array layers: " + Texture.getMaxTextureArrayLayers());
+
 		initScene();
 		// legacyLoop();
 		interpolationGameLoop();
