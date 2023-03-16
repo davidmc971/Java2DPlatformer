@@ -58,6 +58,8 @@ public class Game implements Runnable {
 		interpolationGameLoop();
 	}
 
+	public static int drawCalls = 0;
+
 	protected void interpolationGameLoop() {
 		long lastTime = System.nanoTime();
 		double maxFramesPerSecond = 300;
@@ -104,10 +106,12 @@ public class Game implements Runnable {
 			if (System.currentTimeMillis() - updateDisplayTimer > 1000) {
 				updateDisplayTimer += 1000;
 				System.out.println("FPS: " + lastFramesPerSecond
-						+ "\tUPS: " + lastUpdatesPerSecond
-						+ "\tGameObjectCount: " + handler.objects.size());
+						+ "  \tDraw Calls: " + drawCalls
+						+ "\nUPS: " + lastUpdatesPerSecond
+						+ "  \tGameObjectCount: " + handler.objects.size());
 				lastFramesPerSecond = 0;
 				lastUpdatesPerSecond = 0;
+				drawCalls = 0;
 			}
 		}
 	}

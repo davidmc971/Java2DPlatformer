@@ -17,6 +17,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import io.github.davidmc971.java2dplatformer.main.AssetManager;
 import io.github.davidmc971.java2dplatformer.main.Camera;
+import io.github.davidmc971.java2dplatformer.main.Game;
 import io.github.davidmc971.java2dplatformer.rendering.ShaderType.CouldNotInferShaderTypeException;
 
 public class Renderer {
@@ -193,6 +194,7 @@ public class Renderer {
   private int currentBatchSize;
 
   public void flush() {
+    Game.drawCalls++;
     currentBatchSize = elementBuffer.position();
 
     vertexBuffer.flip();
