@@ -22,6 +22,8 @@ public abstract class GameObject {
 
 	public GameObject(float x, float y, ObjectId id) {
 		position.set(x, y, 0);
+		interpolatedPosition.set(position);
+		lastPosition.set(position);
 		this.id = id;
 	}
 
@@ -37,6 +39,8 @@ public abstract class GameObject {
 	}
 
 	public void preRender(float lerp) {
+		if (position.equals(lastPosition))
+			return;
 		lastPosition.lerp(position, lerp, interpolatedPosition);
 	}
 
