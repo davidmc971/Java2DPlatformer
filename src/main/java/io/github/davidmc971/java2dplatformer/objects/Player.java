@@ -56,65 +56,68 @@ public class Player extends GameObject {
 			tempObject.getDimensions().max(dimensions, maxDimensions);
 			if (tempObject.getPosition().distance(position) > maxDimensions.length())
 				continue;
-			if (tempObject.getId() == ObjectId.Block) {
-				if (getBoundsAll()[0].intersects(tempObject.getBounds())) {
-					position.y = tempObject.getY() - dimensions.y;
-					velocity.y = 0;
-					falling = false;
-					jumping = false;
-					position.y = (int) position.y;
-				} else {
-					falling = true;
-				}
-				if (getBoundsAll()[1].intersects(tempObject.getBounds())) {
-					position.y = tempObject.getY() + tempObject.getHeight();
-					velocity.y = 0;
-				}
-				if (getBoundsAll()[2].intersects(tempObject.getBounds())) {
-					position.x = tempObject.getX() - dimensions.x;
-				}
-				if (getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					position.x = tempObject.getX() + tempObject.getWidth();
-				}
-			}
-			if (tempObject.getId() == ObjectId.Death) {
-				if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setX(this.getCheckX());
-					this.setY(this.getCheckY());
-				}
 
-			}
-			if (tempObject.getId() == ObjectId.Check) {
-				if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setCheckX(tempObject.getX() + 1);
-					this.setCheckY(tempObject.getY() + 1);
-				}
-			}
-			if (tempObject.getId() == ObjectId.Finish) {
-				if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					if (handler.getLevelHandler().isActive() && !handler.getLevelHandler().isLoading()) {
-						System.out.println("Starting next level!");
-						handler.getLevelHandler().nextLevel();
+			switch (tempObject.getId()) {
+				case Block:
+					if (getBoundsAll()[0].intersects(tempObject.getBounds())) {
+						position.y = tempObject.getY() - dimensions.y;
+						velocity.y = 0;
+						falling = false;
+						jumping = false;
+						position.y = (int) position.y;
+					} else {
+						falling = true;
 					}
-				}
-
-			}
-			if (tempObject.getId() == ObjectId.Elevator) {
-				if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[1].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[2].intersects(tempObject.getBounds()) ||
-						getBoundsAll()[3].intersects(tempObject.getBounds())) {
-					this.setVelY(this.getVelY() - 450f * dt);
-				}
+					if (getBoundsAll()[1].intersects(tempObject.getBounds())) {
+						position.y = tempObject.getY() + tempObject.getHeight();
+						velocity.y = 0;
+					}
+					if (getBoundsAll()[2].intersects(tempObject.getBounds())) {
+						position.x = tempObject.getX() - dimensions.x;
+					}
+					if (getBoundsAll()[3].intersects(tempObject.getBounds())) {
+						position.x = tempObject.getX() + tempObject.getWidth();
+					}
+					break;
+				case Death:
+					if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[1].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[2].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[3].intersects(tempObject.getBounds())) {
+						this.setX(this.getCheckX());
+						this.setY(this.getCheckY());
+					}
+					break;
+				case Check:
+					if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[1].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[2].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[3].intersects(tempObject.getBounds())) {
+						this.setCheckX(tempObject.getX() + 1);
+						this.setCheckY(tempObject.getY() + 1);
+					}
+					break;
+				case Finish:
+					if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[1].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[2].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[3].intersects(tempObject.getBounds())) {
+						if (handler.getLevelHandler().isActive() && !handler.getLevelHandler().isLoading()) {
+							System.out.println("Starting next level!");
+							handler.getLevelHandler().nextLevel();
+						}
+					}
+					break;
+				case Elevator:
+					if (getBoundsAll()[0].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[1].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[2].intersects(tempObject.getBounds()) ||
+							getBoundsAll()[3].intersects(tempObject.getBounds())) {
+						this.setVelY(this.getVelY() - 450f * dt);
+					}
+					break;
+				default:
+					break;
 			}
 		}
 	}
