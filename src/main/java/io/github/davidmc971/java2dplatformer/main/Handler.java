@@ -1,6 +1,7 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
@@ -11,7 +12,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Handler {
 
-	public LinkedList<GameObject> objects = new LinkedList<GameObject>();
+	public List<GameObject> objects = new ArrayList<>();
 
 	private Game game;
 

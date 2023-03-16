@@ -1,7 +1,7 @@
 package io.github.davidmc971.java2dplatformer.framework;
 
 import java.awt.Rectangle;
-import java.util.LinkedList;
+import java.util.List;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -29,7 +29,7 @@ public abstract class GameObject {
 		lastPosition.set(position);
 	}
 
-	public abstract void update(float dt, LinkedList<GameObject> object);
+	public abstract void update(float dt, List<GameObject> object);
 
 	public void onRender(Renderer renderer, float lerp) {
 		preRender(lerp);

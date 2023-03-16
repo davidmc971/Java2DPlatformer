@@ -2,7 +2,7 @@ package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.joml.Vector3f;
 
@@ -32,7 +32,7 @@ public class Player extends GameObject {
 		}
 	}
 
-	public void update(float dt, LinkedList<GameObject> object) {
+	public void update(float dt, List<GameObject> object) {
 		position.x += velocity.x * dt;
 		position.y += velocity.y * dt;
 		if (falling || jumping) {
@@ -49,7 +49,7 @@ public class Player extends GameObject {
 
 	private Vector3f maxDimensions = new Vector3f();
 
-	private void collision(float dt, LinkedList<GameObject> object) {
+	private void collision(float dt, List<GameObject> object) {
 		GameObject tempObject;
 		for (int i = 0; i < handler.objects.size(); i++) {
 			tempObject = handler.objects.get(i);

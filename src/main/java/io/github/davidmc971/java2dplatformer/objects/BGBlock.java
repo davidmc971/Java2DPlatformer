@@ -1,7 +1,7 @@
 package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
-import java.util.LinkedList;
+import java.util.List;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
@@ -15,7 +15,7 @@ public class BGBlock extends GameObject {
 		super(x, y, ObjectId.Background);
 	}
 
-	public void update(float dt, LinkedList<GameObject> object) {
+	public void update(float dt, List<GameObject> object) {
 		counter += 0.1;
 		if (counter == 360) {
 			counter = 0;

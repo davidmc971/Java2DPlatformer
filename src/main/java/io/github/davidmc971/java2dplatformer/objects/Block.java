@@ -1,7 +1,7 @@
 package io.github.davidmc971.java2dplatformer.objects;
 
 import java.awt.Rectangle;
-import java.util.LinkedList;
+import java.util.List;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
@@ -13,7 +13,7 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 		super(x, y, id);
 	}
 
-	public void update(float dt, LinkedList<GameObject> object) {
+	public void update(float dt, List<GameObject> object) {
 
 	}
 
