@@ -4,6 +4,8 @@ import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import java.text.DecimalFormat;
+
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -79,6 +81,8 @@ public class Game implements Runnable {
 		float avgRenderTimeMs = 0;
 		float lastUpdateTimeMs = 0;
 		float avgUpdateTimeMs = 0;
+		DecimalFormat millisecondsFormat = new DecimalFormat("0.000");
+		DecimalFormat integerFormat = new DecimalFormat("00000");
 		while (running) {
 			now = System.nanoTime();
 			frameTime = (now - lastTime) / 1_000_000_000d;
@@ -120,12 +124,12 @@ public class Game implements Runnable {
 				avgUpdateTimeMs /= (float) lastUpdatesPerSecond;
 				avgRenderTimeMs /= (float) lastFramesPerSecond;
 				updateDisplayTimer += 1000;
-				System.out.println("> FPS: " + lastFramesPerSecond
-						+ "  \tAvg Frame Time:   " + avgRenderTimeMs + "ms"
-						+ "  \tDraw Calls: " + drawCalls
-						+ "\n  UPS: " + lastUpdatesPerSecond
-						+ "  \tAvg Update Time:  " + avgUpdateTimeMs + "ms"
-						+ "  \tGameObjectCount: " + handler.objects.size());
+				System.out.println("> FPS:  " + integerFormat.format(lastFramesPerSecond).replaceAll("\\G0", " ")
+				/*            */ + " | ø  Frame Time:  " + millisecondsFormat.format(avgRenderTimeMs) + "ms"
+				/*            */ + " |       Draw Calls:  " + integerFormat.format(drawCalls).replaceAll("\\G0", " ")
+				/*          */ + "\n  UPS:  " + integerFormat.format(lastUpdatesPerSecond).replaceAll("\\G0", " ")
+				/*            */ + " | ø Update Time:  " + millisecondsFormat.format(avgUpdateTimeMs) + "ms"
+				/*            */ + " | GameObject Count:  " + integerFormat.format(handler.objects.size()).replaceAll("\\G0", " "));
 				avgUpdateTimeMs = 0;
 				avgRenderTimeMs = 0;
 				lastFramesPerSecond = 0;
