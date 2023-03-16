@@ -75,6 +75,10 @@ public class Game implements Runnable {
 		double accumulator = 0;
 		double renderLerp = 0;
 		double updateTimeTotal = 0;
+		float lastRenderTimeMs = 0;
+		float avgRenderTimeMs = 0;
+		float lastUpdateTimeMs = 0;
+		float avgUpdateTimeMs = 0;
 		while (running) {
 			now = System.nanoTime();
 			frameTime = (now - lastTime) / 1_000_000_000d;
@@ -86,7 +90,10 @@ public class Game implements Runnable {
 				lastUpdatesPerSecond++;
 				accumulator -= updateTimeStep;
 				updateTimeTotal += updateTimeStep;
+				now = System.nanoTime();
 				update((float) updateTimeTotal, (float) updateTimeStep);
+				lastUpdateTimeMs = (System.nanoTime() - now) / 1_000_000f;
+				avgUpdateTimeMs += lastUpdateTimeMs;
 				if (glfwWindowShouldClose(window))
 					running = false;
 			}
@@ -95,20 +102,32 @@ public class Game implements Runnable {
 			renderLerp = Math.max(Math.min(renderLerp, 1.0d), 0.0d);
 
 			if (!ENABLE_FRAME_LIMITER) {
+				now = System.nanoTime();
 				render((float) renderLerp);
+				lastRenderTimeMs = (System.nanoTime() - now) / 1_000_000f;
+				avgRenderTimeMs += lastRenderTimeMs;
 				lastFramesPerSecond++;
 			} else if (frameTimeAccumulator >= minFrameTime) {
+				now = System.nanoTime();
 				render((float) renderLerp);
+				lastRenderTimeMs = (System.nanoTime() - now) / 1_000_000f;
+				avgRenderTimeMs += lastRenderTimeMs;
 				frameTimeAccumulator -= minFrameTime;
 				lastFramesPerSecond++;
 			}
 
 			if (System.currentTimeMillis() - updateDisplayTimer > 1000) {
+				avgUpdateTimeMs /= (float) lastUpdatesPerSecond;
+				avgRenderTimeMs /= (float) lastFramesPerSecond;
 				updateDisplayTimer += 1000;
-				System.out.println("FPS: " + lastFramesPerSecond
+				System.out.println("> FPS: " + lastFramesPerSecond
+						+ "  \tAvg Frame Time:   " + avgRenderTimeMs + "ms"
 						+ "  \tDraw Calls: " + drawCalls
-						+ "\nUPS: " + lastUpdatesPerSecond
+						+ "\n  UPS: " + lastUpdatesPerSecond
+						+ "  \tAvg Update Time:  " + avgUpdateTimeMs + "ms"
 						+ "  \tGameObjectCount: " + handler.objects.size());
+				avgUpdateTimeMs = 0;
+				avgRenderTimeMs = 0;
 				lastFramesPerSecond = 0;
 				lastUpdatesPerSecond = 0;
 				drawCalls = 0;

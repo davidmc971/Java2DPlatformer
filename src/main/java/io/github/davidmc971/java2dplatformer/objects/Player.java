@@ -47,10 +47,10 @@ public class Player extends GameObject {
 		collision(dt, object);
 	}
 
-	private GameObject tempObject;
 	private Vector3f maxDimensions = new Vector3f();
 
 	private void collision(float dt, LinkedList<GameObject> object) {
+		GameObject tempObject;
 		for (int i = 0; i < handler.objects.size(); i++) {
 			tempObject = handler.objects.get(i);
 			tempObject.getDimensions().max(dimensions, maxDimensions);

@@ -39,12 +39,14 @@ public class Handler {
 		for (int i = 0; i < objects.size(); i++) {
 			tempObject = objects.get(i);
 
-			if (tempObject.getId() != ObjectId.Background) {
-				if (tempObject.getId() != ObjectId.Player) {
-					tempObject.onRender(renderer, lerp);
-				} else {
+			switch(tempObject.getId()) {
+				case Background:
+					break;
+				case Player:
 					playerReference = (Player) tempObject;
-				}
+					break;
+				default:
+					tempObject.onRender(renderer, lerp);
 			}
 		}
 
