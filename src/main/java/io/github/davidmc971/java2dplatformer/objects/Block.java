@@ -20,8 +20,8 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 	public void render(Renderer renderer) {
 		switch (getId()) {
 			case Block:
-				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						0f / 255f, 255f / 255f, 0f / 255f, 1);
+				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
+						0f / 255f, 255f / 255f, 0f / 255f, 1, 0);
 				break;
 			case Finish:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 16, 16,
@@ -35,20 +35,20 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 						40f / 255f, 40f / 255f, 40f / 255f, 1);
 				break;
 			case Death:
-				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						200f / 255f, 0, 0, 1);
+				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
+						200f / 255f, 0, 0, 1, 1);
 				break;
 			case Check:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
 						0, 170f / 255f, 170f / 255f, 1);
 				break;
 			case Elevator:
-				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						20f / 255f, 20f / 255f, 170f / 255f, 1);
+				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
+						20f / 255f, 20f / 255f, 170f / 255f, 0.5f, 2);
 				break;
 			case Enemy:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						170f / 255f, 20f / 255f, 170f / 255f, 1);
+						170f / 255f, 20f / 255f, 170f / 255f, 0.5f);
 				break;
 			default:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 16, 16,

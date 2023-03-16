@@ -19,6 +19,7 @@ import io.github.davidmc971.java2dplatformer.main.AssetManager;
 import io.github.davidmc971.java2dplatformer.main.Camera;
 import io.github.davidmc971.java2dplatformer.main.Game;
 import io.github.davidmc971.java2dplatformer.rendering.ShaderType.CouldNotInferShaderTypeException;
+import io.github.davidmc971.java2dplatformer.util.GLTextureSlot;
 
 public class Renderer {
 
@@ -36,7 +37,9 @@ public class Renderer {
   private Camera camera;
   private Matrix4f m4fModel = new Matrix4f();
 
-  private Texture testTexture;
+  private Texture textureBrick1;
+  private Texture textureBrick2;
+  private Texture textureBrick3;
 
   private static final int RENDER_BATCH_QUAD_AMOUNT = 8192;
 
@@ -56,7 +59,9 @@ public class Renderer {
 
     shaderProgram.link();
 
-    testTexture = AssetManager.getTextureInternal("/img/textures/Brick-01.png");
+    textureBrick1 = AssetManager.getTextureInternal("/img/textures/Brick-01.png");
+    textureBrick2 = AssetManager.getTextureInternal("/img/textures/Brick-02.png");
+    textureBrick3 = AssetManager.getTextureInternal("/img/textures/Brick-03.png");
 
     uLocModel = shaderProgram.getUniformLocation("model");
     uLocView = shaderProgram.getUniformLocation("view");
@@ -105,8 +110,10 @@ public class Renderer {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     GL20.glUseProgram(shaderProgram.programId);
 
-    testTexture.bind(GL13.GL_TEXTURE1);
-    shaderProgram.sendTextureUniform("textureSampler", 1);
+    textureBrick1.bind(0);
+    textureBrick2.bind(1);
+    textureBrick3.bind(2);
+    shaderProgram.sendTextureUniform("textureSampler", GLTextureSlot.getMaxTextureSlotsNumberArray());
 
     GL30.glBindVertexArray(vao);
 
@@ -127,7 +134,9 @@ public class Renderer {
     GL20.glDisableVertexAttribArray(2);
     GL20.glDisableVertexAttribArray(3);
 
-    testTexture.unbind();
+    textureBrick1.unbind();
+    textureBrick2.unbind();
+    textureBrick3.unbind();
 
     GL30.glBindVertexArray(0);
     GL20.glUseProgram(0);
@@ -153,7 +162,7 @@ public class Renderer {
   }
 
   public void drawQuad(float x, float y, float z, float w, float h, float r, float g, float b, float a) {
-    drawQuadAny(x, y, z, w, h, r, g, b, a, 0);
+    drawQuadAny(x, y, z, w, h, r, g, b, a, -1);
   }
 
   public void drawTexturedQuad(float x, float y, float z, float w, float h, float texId) {

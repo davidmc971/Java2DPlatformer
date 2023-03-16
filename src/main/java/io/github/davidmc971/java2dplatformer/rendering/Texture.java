@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL45;
 
 import io.github.davidmc971.java2dplatformer.main.Disposable;
+import io.github.davidmc971.java2dplatformer.util.GLTextureSlot;
 
 public class Texture implements Disposable {
   public final int textureId;
@@ -70,13 +71,13 @@ public class Texture implements Disposable {
     return new Texture(image, width, height, channels);
   }
 
-  public void bind(int glTextureSlot) {
-    GL13.glActiveTexture(glTextureSlot);
+  public void bind(int slotNumber) {
+    GL13.glActiveTexture(GLTextureSlot.get(slotNumber).glTextureSlot);
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
   }
 
-  public void bindToTextureUnit(int slot) {
-    GL45.glBindTextureUnit(slot, textureId);
+  public void bindToTextureUnit45(int slot) {
+    GL45.glBindTextureUnit(GLTextureSlot.get(slot).slotNumber, textureId);
   }
 
   public void unbind() {
@@ -84,7 +85,7 @@ public class Texture implements Disposable {
   }
 
   public static int getMaxTextureSlots() {
-    return GL11.glGetInteger(GL13.GL_MAX_TEXTURE_UNITS);
+    return GLTextureSlot.getMaxTextureSlots();
   }
 
   public static int getMaxTextureSize() {
