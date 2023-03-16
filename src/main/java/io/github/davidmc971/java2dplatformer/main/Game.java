@@ -55,41 +55,7 @@ public class Game implements Runnable {
 		System.out.println("Max texture size: " + Texture.getMaxTextureSize());
 		System.out.println("Max texture array layers: " + Texture.getMaxTextureArrayLayers());
 
-		// legacyLoop();
 		interpolationGameLoop();
-	}
-
-	protected void legacyLoop() {
-		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
-		double totalUpdateTime = 0;
-		double ns = 1000000000 / amountOfTicks;
-		double delta = 0;
-		long timer = System.currentTimeMillis();
-		int updates = 0;
-		int frames = 0;
-		while (running) {
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			while (delta >= 1) {
-				totalUpdateTime += 1f / amountOfTicks;
-				update((float) totalUpdateTime, 1f / (float) amountOfTicks);
-				if (glfwWindowShouldClose(window))
-					running = false;
-				updates++;
-				delta--;
-			}
-			render(1f);
-			frames++;
-
-			if (System.currentTimeMillis() - timer > 1000) {
-				timer += 1000;
-				System.out.println("FPS: " + frames + " TICKS: " + updates);
-				frames = 0;
-				updates = 0;
-			}
-		}
 	}
 
 	protected void interpolationGameLoop() {
