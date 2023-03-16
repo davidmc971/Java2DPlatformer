@@ -13,7 +13,6 @@ public class Handler {
 
 	public LinkedList<GameObject> objects = new LinkedList<GameObject>();
 
-	private GameObject tempObject;
 	private Game game;
 
 	public Handler(Game game) {
@@ -22,11 +21,10 @@ public class Handler {
 
 	public void tick(float t, float dt) {
 		if (!game.getLevelHandler().isActive() || game.getLevelHandler().isLoading()) {
-			tempObject = null;
 			return;
 		}
-		for (int i = 0; i < objects.size(); i++) {
-			tempObject = objects.get(i);
+
+		for (GameObject tempObject : objects) {
 			tempObject.preUpdate();
 			tempObject.update(dt, objects);
 		}
@@ -36,10 +34,8 @@ public class Handler {
 
 	public void render(Renderer renderer, float lerp, Camera camera) {
 
-		for (int i = 0; i < objects.size(); i++) {
-			tempObject = objects.get(i);
-
-			switch(tempObject.getId()) {
+		for (GameObject tempObject : objects) {
+			switch (tempObject.getId()) {
 				case Background:
 					break;
 				case Player:
@@ -66,9 +62,7 @@ public class Handler {
 	}
 
 	public void renderBG(Renderer renderer, float lerp) {
-		for (int i = 0; i < objects.size(); i++) {
-			tempObject = objects.get(i);
-
+		for (GameObject tempObject : objects) {
 			if (tempObject.getId() == ObjectId.Background) {
 				((BGBlock) tempObject).onRender(renderer, lerp);
 			}
