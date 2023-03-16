@@ -2,7 +2,6 @@ package io.github.davidmc971.java2dplatformer.main;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
@@ -14,7 +13,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 public class Handler {
 
 	public List<GameObject> objects = new ArrayList<>();
-	public Semaphore objectsWriteLock = new Semaphore(1);
+	private boolean shouldLoadNextLevel = false;
 
 	private Game game;
 
@@ -26,12 +25,15 @@ public class Handler {
 		if (!game.getLevelHandler().isActive() || game.getLevelHandler().isLoading()) {
 			return;
 		}
-		while(!objectsWriteLock.tryAcquire());
 		for (GameObject tempObject : objects) {
 			tempObject.preUpdate();
 			tempObject.update(dt, objects);
 		}
-		objectsWriteLock.release();
+
+		if (shouldLoadNextLevel) {
+			shouldLoadNextLevel = false;
+			getLevelHandler().nextLevel();
+		}
 	}
 
 	private Player playerReference = null;
@@ -51,9 +53,8 @@ public class Handler {
 		}
 
 		if (playerReference != null) {
-			playerReference.preRender(lerp);
+			playerReference.onRender(renderer, lerp);
 			camera.tick(playerReference);
-			playerReference.render(renderer);
 		}
 	}
 
@@ -77,10 +78,12 @@ public class Handler {
 		return game.getLevelHandler();
 	}
 
+	public void nextLevel() {
+		shouldLoadNextLevel = true;
+	}
+
 	public void clearObjects() {
-		while(!objectsWriteLock.tryAcquire());
-		objects.clear();
 		playerReference = null;
-		objectsWriteLock.release();
+		objects.clear();
 	}
 }

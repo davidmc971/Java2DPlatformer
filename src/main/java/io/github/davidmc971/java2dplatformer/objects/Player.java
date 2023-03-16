@@ -104,7 +104,7 @@ public class Player extends GameObject {
 							getBoundsAll()[3].intersects(tempObject.getBounds())) {
 						if (handler.getLevelHandler().isActive() && !handler.getLevelHandler().isLoading()) {
 							System.out.println("Starting next level!");
-							handler.getLevelHandler().nextLevel();
+							handler.nextLevel();
 						}
 					}
 					break;
