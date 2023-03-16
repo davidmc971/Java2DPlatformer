@@ -47,9 +47,15 @@ public class Player extends GameObject {
 		collision(dt, object);
 	}
 
+	private GameObject tempObject;
+	private Vector3f maxDimensions = new Vector3f();
+
 	private void collision(float dt, LinkedList<GameObject> object) {
 		for (int i = 0; i < handler.objects.size(); i++) {
-			GameObject tempObject = handler.objects.get(i);
+			tempObject = handler.objects.get(i);
+			tempObject.getDimensions().max(dimensions, maxDimensions);
+			if (tempObject.getPosition().distance(position) > maxDimensions.length())
+				continue;
 			if (tempObject.getId() == ObjectId.Block) {
 				if (getBoundsAll()[0].intersects(tempObject.getBounds())) {
 					position.y = tempObject.getY() - dimensions.y;
