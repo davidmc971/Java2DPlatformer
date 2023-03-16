@@ -2,9 +2,6 @@ package io.github.davidmc971.java2dplatformer.main;
 
 import java.util.LinkedList;
 
-import com.badlogic.ashley.core.PooledEngine;
-
-import io.github.davidmc971.java2dplatformer.ecs.ECSEngine;
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
 import io.github.davidmc971.java2dplatformer.framework.ObjectId;
@@ -18,11 +15,9 @@ public class Handler {
 
 	private GameObject tempObject;
 	private Game game;
-	private ECSEngine ecsEngine;
 
-	public Handler(Game game, ECSEngine ecsEngine, PooledEngine ashleyECSPooledEngine) {
+	public Handler(Game game) {
 		this.game = game;
-		this.ecsEngine = ecsEngine;
 	}
 
 	public void tick(float t, float dt) {

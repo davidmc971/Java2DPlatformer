@@ -29,8 +29,6 @@ switch (OperatingSystem.current()) {
 
 repositories {
 	mavenCentral()
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-	maven { url "https://oss.sonatype.org/content/repositories/releases/" }
 }
 
 // project.ext.lwjglNatives = "natives-windows-x86"
@@ -72,7 +70,7 @@ dependencies {
 
 	implementation "org.joml:joml:${jomlVersion}"
 
-	implementation "com.badlogicgames.ashley:ashley:1.7.3"
+  implementation "org.dyn4j:dyn4j:5.0.1"
 }
 
 application {
