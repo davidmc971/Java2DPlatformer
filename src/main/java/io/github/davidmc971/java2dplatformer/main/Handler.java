@@ -32,6 +32,8 @@ public class Handler {
 		}
 	}
 
+	private Player playerReference = null;
+
 	public void render(Renderer renderer, float lerp, Camera camera) {
 
 		for (int i = 0; i < objects.size(); i++) {
@@ -40,17 +42,16 @@ public class Handler {
 			if (tempObject.getId() != ObjectId.Background) {
 				if (tempObject.getId() != ObjectId.Player) {
 					tempObject.onRender(renderer, lerp);
+				} else {
+					playerReference = (Player) tempObject;
 				}
 			}
 		}
-		for (int i = 0; i < objects.size(); i++) {
-			tempObject = objects.get(i);
 
-			if (tempObject.getId() == ObjectId.Player) {
-				tempObject.preRender(lerp);
-				camera.tick((Player) tempObject);
-				tempObject.render(renderer);
-			}
+		if (playerReference != null) {
+			playerReference.preRender(lerp);
+			camera.tick(playerReference);
+			playerReference.render(renderer);
 		}
 	}
 
