@@ -38,7 +38,7 @@ public class Renderer {
 
   private Texture testTexture;
 
-  private static final int RENDER_BATCH_QUAD_AMOUNT = 2048;
+  private static final int RENDER_BATCH_QUAD_AMOUNT = 8192;
 
   public void initialize(Camera camera) {
     this.camera = camera;
@@ -145,6 +145,9 @@ public class Renderer {
   }
 
   public void drawQuad(float x, float y, float z, float w, float h, float r, float g, float b, float a) {
+    if (!camera.coordsVisible2D(x + w / 2, y + h / 2, w, h))
+      return;
+
     if (vertexBuffer.remaining() < 4 || elementBuffer.remaining() < 6)
       flush();
 

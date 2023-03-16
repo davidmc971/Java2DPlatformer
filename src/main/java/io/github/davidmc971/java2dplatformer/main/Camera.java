@@ -8,6 +8,7 @@ import io.github.davidmc971.java2dplatformer.objects.Player;
 public class Camera {
 	private Matrix4f m4fProjection, m4fView;
 	private Vector3f v3fPosition;
+	private float w = 0, h = 0;
 
 	public Camera(Vector3f position) {
 		this.v3fPosition = position;
@@ -18,6 +19,8 @@ public class Camera {
 	private float l, r, b, t, zoom = 1.5f, zfW, zfH;
 
 	public void setupOrtho(float width, float height) {
+		w = width;
+		h = height;
 		m4fProjection.identity();
 		zfW = width - width / zoom;
 		zfH = height - height / zoom;
@@ -31,6 +34,15 @@ public class Camera {
 		// 1280 -> 0 | 1280 -> 320
 		t = 0 + zfH / 2f;
 		m4fProjection.ortho(l, r, b, t, -1, 1000);
+	}
+
+	public boolean coordsVisible2D(float x, float y, float qw, float qh) {
+		// if (Game.drawCalls % 20 < 2) {
+		// System.out.println("Camera: " + -v3fPosition.x + ", " + -v3fPosition.y);
+		// System.out.println("Check: " + x + ", " + y);
+		// }
+		return Math.abs((-v3fPosition.x + (w / 2)) - x) < w / 2 / zoom + qw
+		&& Math.abs((-v3fPosition.y + (h / 2)) - y) < h / 2 / zoom + qh;
 	}
 
 	public Matrix4f getViewMatrix() {
@@ -176,15 +188,17 @@ public class Camera {
 
 	public void tick(Player player) {
 		if (player.getFocusCamera()) {
-			v3fPosition.x = -(player.getInterpolatedPosition().x) + (float) Game.WIDTH / 2f - player.getDimensions().x / 2f;
-			v3fPosition.y = -(player.getInterpolatedPosition().y) + (float) Game.HEIGHT / 2f - player.getDimensions().y / 2f;
+			v3fPosition.x = -(player.getInterpolatedPosition().x) + w / 2f
+					- player.getDimensions().x / 2f;
+			v3fPosition.y = -(player.getInterpolatedPosition().y) + h / 2f
+					- player.getDimensions().y / 2f;
 		} // else {
-		// glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
-		// this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
-		// ((float) mouseXBuf.get()) - Game.WIDTH / 2;
-		// this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
-		// ((float) mouseYBuf.get()) + Game.HEIGHT / 2;
-		// }
+			// glfwGetCursorPos(window, mouseXBuf, mouseYBuf);
+			// this.x = -player.getX() + Game.WIDTH / 2 - player.getBounds().width / 2 +
+			// ((float) mouseXBuf.get()) - Game.WIDTH / 2;
+			// this.y = -player.getY() + Game.HEIGHT / 2 - player.getBounds().height / 2 -
+			// ((float) mouseYBuf.get()) + Game.HEIGHT / 2;
+			// }
 	}
 
 }
