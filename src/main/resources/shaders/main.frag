@@ -3,6 +3,7 @@ varying vec4 vColor;
 uniform sampler2D textureSampler;
 
 in vec2 fUVCoords;
+in float fTextureId;
 
 layout(location = 0) out vec4 colorOut;
 

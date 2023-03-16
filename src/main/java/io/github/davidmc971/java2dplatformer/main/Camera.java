@@ -41,8 +41,8 @@ public class Camera {
 		// System.out.println("Camera: " + -v3fPosition.x + ", " + -v3fPosition.y);
 		// System.out.println("Check: " + x + ", " + y);
 		// }
-		return Math.abs((-v3fPosition.x + (w / 2)) - x) < w / 2 / zoom + qw
-		&& Math.abs((-v3fPosition.y + (h / 2)) - y) < h / 2 / zoom + qh;
+		return Math.abs((-v3fPosition.x + (w / 2)) - (x + qw / 2)) < w / 2 / zoom + qw / 2
+				&& Math.abs((-v3fPosition.y + (h / 2)) - (y + qh / 2)) < h / 2 / zoom + qh / 2;
 	}
 
 	public Matrix4f getViewMatrix() {

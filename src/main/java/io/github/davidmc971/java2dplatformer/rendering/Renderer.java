@@ -65,7 +65,14 @@ public class Renderer {
     vao = GL30.glGenVertexArrays();
     GL30.glBindVertexArray(vao);
 
-    vertexBuffer = BufferUtils.createFloatBuffer(9 * 4 * RENDER_BATCH_QUAD_AMOUNT);
+    int positionsSize = 3;
+    int colorSize = 4;
+    int uvSize = 2;
+    int textureIdSize = 1;
+    int vertexSize = (positionsSize + colorSize + uvSize + textureIdSize);
+    int vertexSizeBytes = vertexSize * Float.BYTES;
+
+    vertexBuffer = BufferUtils.createFloatBuffer(4 * vertexSize * RENDER_BATCH_QUAD_AMOUNT);
     elementBuffer = BufferUtils.createIntBuffer(6 * RENDER_BATCH_QUAD_AMOUNT);
 
     vbo = GL15.glGenBuffers();
@@ -75,11 +82,6 @@ public class Renderer {
     ebo = GL15.glGenBuffers();
     GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
     GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL15.GL_DYNAMIC_DRAW);
-
-    int positionsSize = 3;
-    int colorSize = 4;
-    int uvSize = 2;
-    int vertexSizeBytes = (positionsSize + colorSize + uvSize) * Float.BYTES;
     GL20.glVertexAttribPointer(0, positionsSize, GL11.GL_FLOAT, false, vertexSizeBytes, 0);
     GL20.glEnableVertexAttribArray(0);
 
@@ -89,6 +91,10 @@ public class Renderer {
     GL20.glVertexAttribPointer(2, uvSize, GL11.GL_FLOAT, false, vertexSizeBytes,
         (positionsSize + colorSize) * Float.BYTES);
     GL20.glEnableVertexAttribArray(2);
+
+    GL20.glVertexAttribPointer(3, textureIdSize, GL11.GL_FLOAT, false, vertexSizeBytes,
+        (positionsSize + colorSize + uvSize) * Float.BYTES);
+    GL20.glEnableVertexAttribArray(3);
 
     fbProjectionMatrix = MemoryUtil.memAllocFloat(16);
     fbViewMatrix = MemoryUtil.memAllocFloat(16);
@@ -107,6 +113,7 @@ public class Renderer {
     GL20.glEnableVertexAttribArray(0);
     GL20.glEnableVertexAttribArray(1);
     GL20.glEnableVertexAttribArray(2);
+    GL20.glEnableVertexAttribArray(3);
 
     m4fModel.identity();
     GL20.glUniformMatrix4fv(uLocProjection, false, camera.getProjectionMatrix().get(fbProjectionMatrix));
@@ -118,6 +125,7 @@ public class Renderer {
     GL20.glDisableVertexAttribArray(0);
     GL20.glDisableVertexAttribArray(1);
     GL20.glDisableVertexAttribArray(2);
+    GL20.glDisableVertexAttribArray(3);
 
     testTexture.unbind();
 
@@ -145,7 +153,21 @@ public class Renderer {
   }
 
   public void drawQuad(float x, float y, float z, float w, float h, float r, float g, float b, float a) {
-    if (!camera.coordsVisible2D(x + w / 2, y + h / 2, w, h))
+    drawQuadAny(x, y, z, w, h, r, g, b, a, 0);
+  }
+
+  public void drawTexturedQuad(float x, float y, float z, float w, float h, float texId) {
+    drawQuadAny(x, y, z, w, h, 1, 1, 1, 1, texId);
+  }
+
+  public void drawTexturedQuad(float x, float y, float z, float w, float h, float r, float g, float b, float a,
+      float texId) {
+    drawQuadAny(x, y, z, w, h, r, g, b, a, texId);
+  }
+
+  private void drawQuadAny(/* position */ float x, float y, float z, /* dimensions */ float w, float h,
+      /* color */ float r, float g, float b, float a, /* texture id */ float texId) {
+    if (!camera.coordsVisible2D(x, y, w, h))
       return;
 
     if (vertexBuffer.remaining() < 4 || elementBuffer.remaining() < 6)
@@ -153,16 +175,16 @@ public class Renderer {
 
     vertexBuffer.put(x + w).put(y).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(1).put(0);
+        .put(1).put(0).put(texId);
     vertexBuffer.put(x).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(0).put(1);
+        .put(0).put(1).put(texId);
     vertexBuffer.put(x + w).put(y + h).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(1).put(1);
+        .put(1).put(1).put(texId);
     vertexBuffer.put(x).put(y).put(z)
         .put(r).put(g).put(b).put(a)
-        .put(0).put(0);
+        .put(0).put(0).put(texId);
 
     elementBuffer.put(2 + batchElementOffset).put(1 + batchElementOffset).put(0 + batchElementOffset);
     elementBuffer.put(0 + batchElementOffset).put(1 + batchElementOffset).put(3 + batchElementOffset);
