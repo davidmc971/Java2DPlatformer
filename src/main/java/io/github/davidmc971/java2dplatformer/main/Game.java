@@ -26,8 +26,10 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean VSYNC = false;
 	public static final boolean DEBUG = true;
+	public static final boolean VSYNC = false;
+	public static final boolean ENABLE_FRAME_LIMITER = false;
+	public static final int MAX_FRAMES_PER_SECOND = 300;
 
 	public synchronized void start(int w, int h, String title) {
 		if (running)
@@ -124,7 +126,10 @@ public class Game implements Runnable {
 			renderLerp = accumulator / updateTimeStep;
 			renderLerp = Math.max(Math.min(renderLerp, 1.0d), 0.0d);
 
-			if (frameTimeAccumulator >= minFrameTime) {
+			if (!ENABLE_FRAME_LIMITER) {
+				render((float) renderLerp);
+				lastFramesPerSecond++;
+			} else if (frameTimeAccumulator >= minFrameTime) {
 				render((float) renderLerp);
 				frameTimeAccumulator -= minFrameTime;
 				lastFramesPerSecond++;
@@ -132,7 +137,9 @@ public class Game implements Runnable {
 
 			if (System.currentTimeMillis() - updateDisplayTimer > 1000) {
 				updateDisplayTimer += 1000;
-				System.out.println("FPS: " + lastFramesPerSecond + " TICKS: " + lastUpdatesPerSecond);
+				System.out.println("FPS: " + lastFramesPerSecond
+						+ "\tUPS: " + lastUpdatesPerSecond
+						+ "\tGameObjectCount: " + handler.objects.size());
 				lastFramesPerSecond = 0;
 				lastUpdatesPerSecond = 0;
 			}
