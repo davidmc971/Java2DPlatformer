@@ -127,6 +127,7 @@ public class LevelHandler {
 
 	public void disposeLevel() {
 		handler.clearObjects();
+		System.gc();
 	}
 
 	public int getLevel() {
