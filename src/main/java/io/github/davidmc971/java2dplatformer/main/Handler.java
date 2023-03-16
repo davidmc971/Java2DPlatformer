@@ -2,6 +2,7 @@ package io.github.davidmc971.java2dplatformer.main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
@@ -13,6 +14,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 public class Handler {
 
 	public List<GameObject> objects = new ArrayList<>();
+	public Semaphore objectsWriteLock = new Semaphore(1);
 
 	private Game game;
 
@@ -24,11 +26,12 @@ public class Handler {
 		if (!game.getLevelHandler().isActive() || game.getLevelHandler().isLoading()) {
 			return;
 		}
-
+		while(!objectsWriteLock.tryAcquire());
 		for (GameObject tempObject : objects) {
 			tempObject.preUpdate();
 			tempObject.update(dt, objects);
 		}
+		objectsWriteLock.release();
 	}
 
 	private Player playerReference = null;
@@ -72,5 +75,12 @@ public class Handler {
 
 	public LevelHandler getLevelHandler() {
 		return game.getLevelHandler();
+	}
+
+	public void clearObjects() {
+		while(!objectsWriteLock.tryAcquire());
+		objects.clear();
+		playerReference = null;
+		objectsWriteLock.release();
 	}
 }

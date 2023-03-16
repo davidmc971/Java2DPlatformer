@@ -126,7 +126,7 @@ public class LevelHandler {
 	}
 
 	public void disposeLevel() {
-		handler.objects.clear();
+		handler.clearObjects();
 	}
 
 	public int getLevel() {
