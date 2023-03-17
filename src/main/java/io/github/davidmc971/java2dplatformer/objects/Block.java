@@ -21,7 +21,7 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 		switch (getId()) {
 			case Block:
 				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						0f / 255f, 255f / 255f, 0f / 255f, 1, 0);
+						0f / 255f, 255f / 255f, 0f / 255f, 1, 0, true);
 				break;
 			case Finish:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 16, 16,

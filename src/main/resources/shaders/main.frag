@@ -49,6 +49,6 @@ vec4 samplerLookup(float textureId, vec2 uvCoords) {
 
 void main(void) {
     vec4 texColor = samplerLookup(fTextureId, fUVCoords);
-    float grey = 0.21 * texColor.r + 0.71 * texColor.g + 0.07 * texColor.b;
+    float grey = 0.2126 * texColor.r + 0.7152 * texColor.g + 0.0722 * texColor.b;
     colorOut = (((grey * texColor) * 0.8) + (texColor * 0.5)) * vColor;
 }

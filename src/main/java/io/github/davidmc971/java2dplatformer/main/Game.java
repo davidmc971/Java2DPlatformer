@@ -1,12 +1,13 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import static io.github.davidmc971.java2dplatformer.graphics.RenderUtil.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import java.nio.DoubleBuffer;
 import java.text.DecimalFormat;
 
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -17,6 +18,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Texture;
 
 public class Game implements Runnable {
 	public static int WIDTH, HEIGHT;
+	public static double MOUSE_X = 0, MOUSE_Y = 0;
 	// private static final long serialVersionUID = 7492659545089075909L;
 	private boolean running = false;
 	private Thread thread;
@@ -187,10 +189,12 @@ public class Game implements Runnable {
 
 	private void initGL() {
 		GL.createCapabilities();
-		clearColor3_255(0, 0, 20);
 
 		renderer.initialize(cam);
 	}
+
+	private DoubleBuffer mouseXBuffer = BufferUtils.createDoubleBuffer(1);
+	private DoubleBuffer mouseYBuffer = BufferUtils.createDoubleBuffer(1);
 
 	private void update(float t, float dt) {
 		handler.tick(t, dt);
@@ -215,6 +219,10 @@ public class Game implements Runnable {
 		glfwSwapBuffers(window);
 		// Polls input.
 		glfwPollEvents();
+		
+		glfwGetCursorPos(window, mouseXBuffer, mouseYBuffer);
+		MOUSE_X = mouseXBuffer.get(0);
+		MOUSE_Y = mouseYBuffer.get(0);
 	}
 
 	public void exitGame() {

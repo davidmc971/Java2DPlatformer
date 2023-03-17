@@ -159,17 +159,17 @@ public class Camera {
 	// // glMatrixMode(GL_MODELVIEW);
 	// // }
 
-	// public float getX() {
-	// return x;
-	// }
+	public float getX() {
+		return v3fPosition.x;
+	}
 
 	// public void setX(float x) {
 	// this.x = x;
 	// }
 
-	// public float getY() {
-	// return y;
-	// }
+	public float getY() {
+		return v3fPosition.y;
+	}
 
 	// public void setY(float y) {
 	// this.y = y;
