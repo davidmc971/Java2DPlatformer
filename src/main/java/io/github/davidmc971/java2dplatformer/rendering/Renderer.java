@@ -252,8 +252,9 @@ public class Renderer {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboScene);
         GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
 
-        GL33.glClearColor(0f, 0f, 20f / 255f, 1);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glColorMask(true, true, true, true);
+        GL11.glClearColor(0, 0, 0, 0);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
         GL20.glUseProgram(shaderProgram.programId);
 
         textureBrick1.bind(0);
@@ -300,20 +301,41 @@ public class Renderer {
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
 
-        GL30.glBindVertexArray(lightVao);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+
+        GL11.glColorMask(true, true, true, true);
+        GL11.glClearColor(0, 0, 0, 1);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+
+        GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
+
+        renderLights();
+
+        renderShadows();
+
+        renderSceneFromFb();
+    }
+
+    private void renderSceneFromFb() {
+        GL30.glBindVertexArray(fbVao);
+        GL20.glUseProgram(renderedSceneProgram.programId);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        GL13.glBindTexture(GL13.GL_TEXTURE_2D, sceneMapId);
+
+        GL33.glUniform1i(uLocFbTex, 0);
         GL20.glEnableVertexAttribArray(0);
-        GL20.glUseProgram(lightProgram.programId);
-        // TODO:
-        // GL33.glUniformMatrix4fv(uLocCombinedMVPLightMap, false, combinedMVP.get(fbCombinedMVP));
-        // System.out.println(camera.getX() + ", " + camera.getY());
-        // TODO: world space
-        GL20.glUniform2f(uLocLightPosition, mousePositionScreenSpace.x, mousePositionScreenSpace.y);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, fbVbo);
+
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
 
         GL20.glDisableVertexAttribArray(0);
+
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
+    }
 
+    private void renderShadows() {
         GL30.glBindVertexArray(shadowVao);
         GL20.glUseProgram(shadowMapProgram.programId);
         GL20.glUniform2f(uLocLightPositionShadow, mousePositionScreenSpace.x, mousePositionScreenSpace.y);
@@ -335,29 +357,21 @@ public class Renderer {
         GL20.glDisableVertexAttribArray(1);
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
+    }
 
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
-
-        GL11.glClearColor(0, 0, 20f / 255f, 1);
-
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-
-        GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
-
-        GL30.glBindVertexArray(fbVao);
-        GL20.glUseProgram(renderedSceneProgram.programId);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL13.glBindTexture(GL13.GL_TEXTURE_2D, sceneMapId);
-
-        GL33.glUniform1i(uLocFbTex, 0);
+    private void renderLights() {
+        GL30.glBindVertexArray(lightVao);
         GL20.glEnableVertexAttribArray(0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, fbVbo);
-
+        GL20.glUseProgram(lightProgram.programId);
+        // TODO:
+        // GL33.glUniformMatrix4fv(uLocCombinedMVPLightMap, false,
+        // combinedMVP.get(fbCombinedMVP));
+        // System.out.println(camera.getX() + ", " + camera.getY());
+        // TODO: world space
+        GL20.glUniform2f(uLocLightPosition, mousePositionScreenSpace.x, mousePositionScreenSpace.y);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
 
         GL20.glDisableVertexAttribArray(0);
-
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
     }
