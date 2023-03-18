@@ -3,19 +3,21 @@
 layout(location = 0) in vec2 aPosition;
 layout(location = 1) in float aMoveable;
 
-uniform mat4 MVPMatrix;
-uniform vec2 lightPosition;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
 
-out vec2 fPosition;
+uniform vec2 lightPosition;
+uniform float lightIndex;
 
 void main() {
-  vec4 pos = MVPMatrix * vec4(aPosition.xy, 0., 1.);
+  vec2 pos = aPosition;
   if (aMoveable > 0) {
-      vec2 distance = pos.xy - lightPosition;
+      vec2 distance = pos - lightPosition;
       vec2 scalarDistance = distance / sqrt(distance.x * distance.x + distance.y * distance.y);
-      pos += vec4(scalarDistance * 1000, 0, 0);
+      pos += scalarDistance * 100000;
   }
-  gl_Position = pos;
-	fPosition = pos.xy;
+
+  gl_Position = vec4((projectionMatrix * viewMatrix * vec4(pos.xy, 0, 1)).xy, -lightIndex - 0.5, 1);
 }
 

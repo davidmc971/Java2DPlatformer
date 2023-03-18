@@ -94,6 +94,7 @@ public class LevelHandler {
 
 			}
 		}
+		handler.centerOnPlayer();
 	}
 
 	public boolean isLoading() {

@@ -9,6 +9,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -31,27 +32,12 @@ public class Renderer {
 
     private int uLocModel, uLocView, uLocProjection, vao, vbo, ebo;
 
-    private ShaderProgram renderedSceneProgram, lightProgram, shadowMapProgram;
-    private int fboScene, fboShadow, sceneMapId, shadowMapId;
+    private ShaderProgram renderedSceneProgram;
+    private int fboScene, sceneMapId;
     private IntBuffer drawBuffers;
-    private int fbVao, lightVao, shadowVao, fbVbo, lightVbo, shadowVbo, uLocFbTex, uLocLightPosition,
-            uLocCombinedMVPShadowMap, uLocLightPositionShadow, uLocCombinedMVPLightMap;
-    private List<Vector2f> lights = new ArrayList<>();
+    private int fbVao, fbVbo, uLocFbTex;
 
-    private FloatBuffer fbCombinedMVP;
     private Matrix4f combinedMVP = new Matrix4f();
-
-    // Should contain only vertex coords in 2D
-    private FloatBuffer shadowRegionBuffer;
-
-    private float[] lightQuad = {
-            1, -1, // br
-            -1, -1, // bl
-            -1, 1, // tl
-            1, -1, // br
-            1, 1, // tr
-            -1, 1 // tl
-    };
 
     private float[] fbQuad = {
             1, -1, 1, 0, // br
@@ -78,45 +64,36 @@ public class Renderer {
 
     private static final int RENDER_BATCH_QUAD_AMOUNT = 8192;
 
+    private LightingSystem lightingSystem;
+    private List<Vector4f> lights = new ArrayList<>();
+    private Vector4f mouseLight = new Vector4f();
+    private int fboLightingSystem, lightingMapId;
+    private static int LIGHTING_RESOLUTION_DIVISOR = 4;
+
     public void initialize(Camera camera) {
         this.camera = camera;
         shaderProgram = new ShaderProgram();
         renderedSceneProgram = new ShaderProgram();
-        lightProgram = new ShaderProgram();
-        shadowMapProgram = new ShaderProgram();
-
         try {
             shaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/main.vert"));
             shaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/main.frag"));
             renderedSceneProgram.attachShader(AssetManager.getShaderInternal("/shaders/renderedScene.vert"));
             renderedSceneProgram.attachShader(AssetManager.getShaderInternal("/shaders/renderedScene.frag"));
-            lightProgram.attachShader(AssetManager.getShaderInternal("/shaders/lightShader.vert"));
-            lightProgram.attachShader(AssetManager.getShaderInternal("/shaders/lightShader.frag"));
-            shadowMapProgram.attachShader(AssetManager.getShaderInternal("/shaders/shadowMap.vert"));
-            shadowMapProgram.attachShader(AssetManager.getShaderInternal("/shaders/shadowMap.frag"));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (CouldNotInferShaderTypeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         shaderProgram.link();
         renderedSceneProgram.link();
-        lightProgram.link();
-        shadowMapProgram.link();
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         textureBrick1 = AssetManager.getTextureInternal("/img/textures/Brick-01.png");
         textureBrick2 = AssetManager.getTextureInternal("/img/textures/Brick-02.png");
         textureBrick3 = AssetManager.getTextureInternal("/img/textures/Brick-03.png");
 
-        uLocModel = shaderProgram.getUniformLocation("model");
-        uLocView = shaderProgram.getUniformLocation("view");
-        uLocProjection = shaderProgram.getUniformLocation("projection");
+        uLocModel = shaderProgram.uniform("model");
+        uLocView = shaderProgram.uniform("view");
+        uLocProjection = shaderProgram.uniform("projection");
 
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
@@ -156,7 +133,6 @@ public class Renderer {
         fbProjectionMatrix = MemoryUtil.memAllocFloat(16);
         fbViewMatrix = MemoryUtil.memAllocFloat(16);
         fbModelMatrix = MemoryUtil.memAllocFloat(16);
-        fbCombinedMVP = MemoryUtil.memAllocFloat(16);
 
         fboScene = GL30.glGenFramebuffers();
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboScene);
@@ -171,8 +147,7 @@ public class Renderer {
 
         drawBuffers = BufferUtils.createIntBuffer(32);
 
-        drawBuffers.put(GL30.GL_COLOR_ATTACHMENT0).flip();
-        GL30.glDrawBuffers(drawBuffers);
+        drawBuffers.put(GL30.GL_COLOR_ATTACHMENT0);
 
         assert GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER) == GL30.GL_FRAMEBUFFER_COMPLETE
                 : "Framebuffer initialization error.";
@@ -191,70 +166,52 @@ public class Renderer {
         GL20.glEnableVertexAttribArray(1);
 
         renderedSceneProgram.use();
-        uLocFbTex = GL20.glGetUniformLocation(renderedSceneProgram.programId, "renderedTexture");
+        uLocFbTex = renderedSceneProgram.uniform("renderedTexture");
 
-        lightVao = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(lightVao);
+        fboLightingSystem = GL30.glGenFramebuffers();
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboLightingSystem);
+        lightingMapId = GL11.glGenTextures();
 
-        lightVbo = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, lightVbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, lightQuad, GL15.GL_STATIC_DRAW);
-
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 2 * Float.BYTES, 0);
-        GL20.glEnableVertexAttribArray(0);
-
-        lightProgram.use();
-        // uLocCombinedMVPLightMap = lightProgram.getUniformLocation("MVPMatrix");
-        uLocLightPosition = GL20.glGetUniformLocation(lightProgram.programId, "lightPosition");
-
-        // TODO: figure out good size
-        shadowRegionBuffer = BufferUtils.createFloatBuffer(65536);
-
-        shadowMapProgram.use();
-        uLocCombinedMVPShadowMap = shadowMapProgram.getUniformLocation("MVPMatrix");
-        uLocLightPositionShadow = shadowMapProgram.getUniformLocation("lightPosition");
-
-        shadowVao = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(shadowVao);
-
-        shadowVbo = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, shadowVbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, shadowRegionBuffer.capacity(), GL15.GL_STREAM_DRAW);
-
-        // Shadow buffer contains diagonal boxes with flags on moveable edges
-
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 3 * Float.BYTES, 0);
-        GL20.glEnableVertexAttribArray(0);
-
-        GL20.glVertexAttribPointer(1, 1, GL11.GL_FLOAT, false, 3 * Float.BYTES, 2 * Float.BYTES);
-        GL20.glEnableVertexAttribArray(1);
-
-        fboShadow = GL30.glGenFramebuffers();
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboShadow);
-        shadowMapId = GL11.glGenTextures();
-
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, shadowMapId);
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, Game.WIDTH, Game.HEIGHT, 0, GL11.GL_RGBA,
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightingMapId);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, Game.WIDTH / LIGHTING_RESOLUTION_DIVISOR,
+                Game.HEIGHT / LIGHTING_RESOLUTION_DIVISOR, 0, GL11.GL_RGBA,
                 GL11.GL_UNSIGNED_BYTE, 0);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
 
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, shadowMapId, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, lightingMapId,
+                0);
+
+        // create a renderbuffer object to store depth info
+        int rboId = GL30.glGenRenderbuffers();
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, rboId);
+        GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH_COMPONENT, Game.WIDTH, Game.HEIGHT);
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
+        // attach the renderbuffer to depth attachment point
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, // 1. fbo target: GL_FRAMEBUFFER
+                GL30.GL_DEPTH_ATTACHMENT, // 2. attachment point
+                GL30.GL_RENDERBUFFER, // 3. rbo target: GL_RENDERBUFFER
+                rboId); // 4. rbo ID
 
         drawBuffers.put(GL30.GL_COLOR_ATTACHMENT1).flip();
-        GL30.glDrawBuffers(drawBuffers);
+        GL20.glDrawBuffers(drawBuffers);
 
         assert GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER) == GL30.GL_FRAMEBUFFER_COMPLETE
                 : "Framebuffer initialization error.";
+
+        lightingSystem = new LightingSystem(camera);
+        lights.add(mouseLight);
     }
 
     public void preFrame() {
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboScene);
-        GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        GL11.glColorMask(true, true, true, true);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboScene);
         GL11.glClearColor(0, 0, 0, 0);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+
+        GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
         GL20.glUseProgram(shaderProgram.programId);
 
         textureBrick1.bind(0);
@@ -273,21 +230,16 @@ public class Renderer {
         GL20.glUniformMatrix4fv(uLocProjection, false, camera.getProjectionMatrix().get(fbProjectionMatrix));
         GL20.glUniformMatrix4fv(uLocView, false, camera.getViewMatrix().get(fbViewMatrix));
         GL20.glUniformMatrix4fv(uLocModel, false, m4fModel.get(fbModelMatrix));
-
-        shadowRegionBuffer.clear();
     }
 
-    private Vector2f mousePositionWorldSpace = new Vector2f();
-    private Vector4f mousePositionScreenSpace = new Vector4f();
+    private Vector2f mousePositionScreenSpace = new Vector2f();
+    private Vector3fc mousePositionWorldSpace;
 
     public void postFrame() {
         combinedMVP.identity().mul(camera.getProjectionMatrix()).mul(camera.getViewMatrix()).mul(m4fModel);
         mousePositionScreenSpace.set((((float) Game.MOUSE_X / (float) Game.WIDTH)) * 2f - 1f,
-                (((float) -Game.MOUSE_Y / (float) Game.HEIGHT)) * 2f + 1f, 0, 0);
-        // TODO:
-        // mousePositionScreenSpace.mul(combinedMVP);
-        // mousePositionWorldSpace.set(mousePositionScreenSpace.x,
-        // mousePositionScreenSpace.y);
+                (((float) -Game.MOUSE_Y / (float) Game.HEIGHT)) * 2f + 1f);
+        mousePositionWorldSpace = camera.screenPositionToWorldPosition(mousePositionScreenSpace);
 
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
@@ -301,29 +253,44 @@ public class Renderer {
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
 
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboLightingSystem);
+        GL11.glViewport(0, 0, Game.WIDTH / LIGHTING_RESOLUTION_DIVISOR, Game.HEIGHT / LIGHTING_RESOLUTION_DIVISOR);
 
-        GL11.glColorMask(true, true, true, true);
-        GL11.glClearColor(0, 0, 0, 1);
+        checkAddLight();
+        mouseLight.set(mousePositionWorldSpace, 0);
+        lightingSystem.invoke(lights);
+
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL11.glClearColor(0, 0, 0, 0);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
-        GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
+        GL11.glViewport(
+                0, Game.HEIGHT / 2,
+                Game.WIDTH / 2, Game.HEIGHT / 2);
 
-        renderLights();
+        renderSceneFromFb(0, sceneMapId);
 
-        renderShadows();
+        GL11.glViewport(
+                Game.WIDTH / 2, Game.HEIGHT / 2,
+                Game.WIDTH / 2, Game.HEIGHT / 2);
 
-        renderSceneFromFb();
+        renderSceneFromFb(1, lightingMapId);
+
+        GL11.glViewport(
+                Game.WIDTH / 4, 0,
+                Game.WIDTH / 2, Game.HEIGHT / 2);
+        renderSceneFromFb(1, lightingMapId);
+        renderSceneFromFb(0, sceneMapId);
     }
 
-    private void renderSceneFromFb() {
+    private void renderSceneFromFb(int fbTexId, int drawMapId) {
         GL30.glBindVertexArray(fbVao);
         GL20.glUseProgram(renderedSceneProgram.programId);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL13.glBindTexture(GL13.GL_TEXTURE_2D, sceneMapId);
+        GL13.glActiveTexture(GLTextureSlot.get(fbTexId).glTextureSlot);
+        GL13.glBindTexture(GL13.GL_TEXTURE_2D, drawMapId);
 
-        GL33.glUniform1i(uLocFbTex, 0);
+        GL33.glUniform1i(uLocFbTex, fbTexId);
         GL20.glEnableVertexAttribArray(0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, fbVbo);
 
@@ -335,45 +302,15 @@ public class Renderer {
         GL20.glUseProgram(0);
     }
 
-    private void renderShadows() {
-        GL30.glBindVertexArray(shadowVao);
-        GL20.glUseProgram(shadowMapProgram.programId);
-        GL20.glUniform2f(uLocLightPositionShadow, mousePositionScreenSpace.x, mousePositionScreenSpace.y);
+    private boolean willAddLight = false;
 
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-
-        GL33.glUniformMatrix4fv(uLocCombinedMVPShadowMap, false, combinedMVP.get(fbCombinedMVP));
-
-        currentBatchSize = shadowRegionBuffer.position();
-        shadowRegionBuffer.flip();
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, shadowVbo);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, shadowRegionBuffer);
-
-        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, currentBatchSize);
-
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL30.glBindVertexArray(0);
-        GL20.glUseProgram(0);
-    }
-
-    private void renderLights() {
-        GL30.glBindVertexArray(lightVao);
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glUseProgram(lightProgram.programId);
-        // TODO:
-        // GL33.glUniformMatrix4fv(uLocCombinedMVPLightMap, false,
-        // combinedMVP.get(fbCombinedMVP));
-        // System.out.println(camera.getX() + ", " + camera.getY());
-        // TODO: world space
-        GL20.glUniform2f(uLocLightPosition, mousePositionScreenSpace.x, mousePositionScreenSpace.y);
-        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
-
-        GL20.glDisableVertexAttribArray(0);
-        GL30.glBindVertexArray(0);
-        GL20.glUseProgram(0);
+    private void checkAddLight() {
+        if (!willAddLight && Game.MOUSE_DOWN) {
+            willAddLight = true;
+        } else if (willAddLight && !Game.MOUSE_DOWN) {
+            lights.add(new Vector4f().set(mousePositionWorldSpace, 0));
+            willAddLight = false;
+        }
     }
 
     public void render(io.github.davidmc971.java2dplatformer.ecs.GameObject gameObject) {
@@ -423,11 +360,10 @@ public class Renderer {
         if (!camera.coordsVisible2D(x, y, w, h))
             return;
 
-        if (castsShadow && shadowRegionBuffer.remaining() >= 4) {
+        if (castsShadow) {
             // We are adding the diagonals of the quad into the shadow region buffer as
             // quads themselves.
-            putShadowQuad(shadowRegionBuffer, x, y, x + w, y + h);
-            putShadowQuad(shadowRegionBuffer, x + h, y, x, y + h);
+            lightingSystem.insertShadowDiagonals(x, y, x + w, y + h);
         }
 
         if (vertexBuffer.remaining() < 4 || elementBuffer.remaining() < 6)
@@ -448,48 +384,6 @@ public class Renderer {
 
         elementBuffer.put(2 + batchElementOffset).put(1 + batchElementOffset).put(0 + batchElementOffset);
         elementBuffer.put(0 + batchElementOffset).put(1 + batchElementOffset).put(3 + batchElementOffset);
-        batchElementOffset += 4;
-    }
-
-    private void putShadowQuad(FloatBuffer target, float x1, float y1, float x2, float y2) {
-        /**
-         * 1, -1
-         * -1, -1
-         * -1, 1
-         * 1, -1
-         * 1, 1
-         * -1, 1
-         */
-        target.put(x1).put(y2).put(1)
-                .put(x1).put(y2).put(0)
-                .put(x2).put(y1).put(1)
-                .put(x2).put(y1).put(1)
-                .put(x2).put(y1).put(0)
-                .put(x1).put(y2).put(0);
-    }
-
-    private float[] vertexArray = {
-            // position // color // uv
-            740, 260, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, -1, // 0
-            540, 460, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, -1, // 1
-            740, 460, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1, 1, -1, // 2
-            540, 260, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1, 0, -1 // 3
-    };
-
-    // counterclockwise
-    private int[] elementArray = {
-            2, 1, 0,
-            0, 1, 3
-    };
-
-    private int[] elementArrayWithOffset = new int[elementArray.length];
-
-    public void queueTestSquare() {
-        vertexBuffer.put(vertexArray);
-        for (int i = 0; i < elementArray.length; i++) {
-            elementArrayWithOffset[i] = elementArray[i] + batchElementOffset;
-        }
-        elementBuffer.put(elementArray);
         batchElementOffset += 4;
     }
 

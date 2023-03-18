@@ -1,7 +1,11 @@
 package io.github.davidmc971.java2dplatformer.main;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import io.github.davidmc971.java2dplatformer.objects.Player;
 
@@ -33,7 +37,7 @@ public class Camera {
 		b = height - zfH / 2f;
 		// 1280 -> 0 | 1280 -> 320
 		t = 0 + zfH / 2f;
-		m4fProjection.ortho(l, r, b, t, -1, 1000);
+		m4fProjection.ortho(l, r, b, t, -Short.MAX_VALUE, Short.MAX_VALUE);
 	}
 
 	public boolean coordsVisible2D(float x, float y, float qw, float qh) {
@@ -65,126 +69,13 @@ public class Camera {
 		v3fPosition.add(translation);
 	}
 
-	// private float x, y, z;
-	// private float rx, ry, rz;
-	// private float fov = 90;
-	// private float aspectRatio;
-	// private float zNear = 0.1f;
-	// private float zFar = 1000f;
-	// private int displayWidth, displayHeight;
-	// private long window;
-
-	// public Camera(float x, float y, float z, int displayWidth, int displayHeight,
-	// long window) {
-	// this.x = x;
-	// this.y = y;
-	// this.z = z;
-	// rx = 0;
-	// ry = 0;
-	// rz = 0;
-	// this.displayWidth = displayWidth;
-	// this.displayHeight = displayHeight;
-	// this.window = window;
-	// aspectRatio = (float) displayWidth / (float) displayHeight;
-	// }
-
-	// public void use() {
-	// glRotatef(rx, 1, 0, 0);
-	// glRotatef(ry, 0, 1, 0);
-	// glRotatef(rz, 0, 0, 1);
-	// glTranslatef(x, y, z);
-	// }
-
-	// public float getRx() {
-	// return rx;
-	// }
-
-	// public void setRx(float rx) {
-	// this.rx = rx;
-	// }
-
-	// public float getRy() {
-	// return ry;
-	// }
-
-	// public void setRy(float ry) {
-	// this.ry = ry;
-	// }
-
-	// public float getRz() {
-	// return rz;
-	// }
-
-	// public void setRz(float rz) {
-	// this.rz = rz;
-	// }
-
-	// public float getFov() {
-	// return fov;
-	// }
-
-	// public void setFov(float fov) {
-	// this.fov = fov;
-	// }
-
-	// public float getzNear() {
-	// return zNear;
-	// }
-
-	// public void setzNear(float zNear) {
-	// this.zNear = zNear;
-	// }
-
-	// public float getzFar() {
-	// return zFar;
-	// }
-
-	// public void setzFar(float zFar) {
-	// this.zFar = zFar;
-	// }
-
-	// // public void initCam2D() {
-	// // glMatrixMode(GL_PROJECTION);
-	// // glLoadIdentity();
-	// // glOrtho(0, displayWidth, displayHeight, 0, 1, -1);
-	// // // gluPerspective(90f, aspectRatio, 0.1f, 1000f);
-	// // glMatrixMode(GL_MODELVIEW);
-	// // }
-
-	// // public void initCam3D(){
-	// // glMatrixMode(GL_PROJECTION);
-	// // glLoadIdentity();
-	// // //glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 1, -1);
-	// // gluPerspective(90f, aspectRatio, 0.1f, 1000f);
-	// // glMatrixMode(GL_MODELVIEW);
-	// // }
-
 	public float getX() {
 		return v3fPosition.x;
 	}
 
-	// public void setX(float x) {
-	// this.x = x;
-	// }
-
 	public float getY() {
 		return v3fPosition.y;
 	}
-
-	// public void setY(float y) {
-	// this.y = y;
-	// }
-
-	// public float getZ() {
-	// return z;
-	// }
-
-	// public void setZ(float z) {
-	// this.z = z;
-	// }
-
-	// private DoubleBuffer mouseXBuf = DoubleBuffer.allocate(2);
-	// private DoubleBuffer mouseYBuf = DoubleBuffer.allocate(2);
 
 	public void tick(Player player) {
 		if (player.getFocusCamera()) {
@@ -201,4 +92,15 @@ public class Camera {
 			// }
 	}
 
+	private Matrix4f conversionMatrix = new Matrix4f();
+
+	public Vector3fc screenPositionToWorldPosition(Vector2fc screenPosition) {
+		conversionMatrix.identity().mul(m4fProjection).mul(m4fView).invert();
+		return conversionMatrix.transformPosition(new Vector3f(screenPosition.x(), screenPosition.y(), 0));
+	}
+
+	public Vector2fc worldPositionToScreenPosition(Vector3fc worldPosition) {
+		// TODO:
+		return new Vector2f();
+	}
 }

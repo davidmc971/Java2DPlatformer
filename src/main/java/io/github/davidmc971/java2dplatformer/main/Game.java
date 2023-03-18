@@ -19,6 +19,7 @@ import io.github.davidmc971.java2dplatformer.rendering.Texture;
 public class Game implements Runnable {
 	public static int WIDTH, HEIGHT;
 	public static double MOUSE_X = 0, MOUSE_Y = 0;
+	public static boolean MOUSE_DOWN = false;
 	// private static final long serialVersionUID = 7492659545089075909L;
 	private boolean running = false;
 	private Thread thread;
@@ -219,10 +220,11 @@ public class Game implements Runnable {
 		glfwSwapBuffers(window);
 		// Polls input.
 		glfwPollEvents();
-		
+
 		glfwGetCursorPos(window, mouseXBuffer, mouseYBuffer);
 		MOUSE_X = mouseXBuffer.get(0);
 		MOUSE_Y = mouseYBuffer.get(0);
+		MOUSE_DOWN = glfwGetMouseButton(this.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 	}
 
 	public void exitGame() {

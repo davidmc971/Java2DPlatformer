@@ -1,9 +1,13 @@
 package io.github.davidmc971.java2dplatformer.main;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.joml.Vector3f;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
@@ -111,5 +115,20 @@ public class Handler {
 	public void clearObjects() {
 		playerReference = null;
 		objects.clear();
+	}
+
+	public void centerOnPlayer() {
+		// for (GameObject gameObject : objects) {
+		// 	if (gameObject.getId() == ObjectId.Player) {
+		// 		playerReference = (Player) gameObject;
+		// 		break;
+		// 	}
+		// }
+		// Vector3f position = new Vector3f().set(playerReference.getPosition());
+		// System.out.println(position.toString(new DecimalFormat("0.###")));
+		// objects.forEach((object) -> {
+		// 	object.getPosition().sub(position);
+		// });
+		// System.out.println(objects.get(objects.size() - 1).getPosition().toString(new DecimalFormat("0.###")));
 	}
 }
