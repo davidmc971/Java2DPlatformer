@@ -80,7 +80,7 @@ public class LightingSystem {
         projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
         viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
         modelMatrixBuffer = BufferUtils.createFloatBuffer(16);
-        shadowDiagonalsBuffer = BufferUtils.createFloatBuffer(250000);
+        shadowDiagonalsBuffer = BufferUtils.createFloatBuffer(512000);
         lightBoxBuffer = BufferUtils.createFloatBuffer(12);
 
         lightVao = GL33.glGenVertexArrays();

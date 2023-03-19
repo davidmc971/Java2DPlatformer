@@ -203,6 +203,7 @@ public class Game implements Runnable {
 	}
 
 	private void render(float renderLerp) {
+		handler.preRender(renderLerp, cam);
 		renderer.preFrame();
 
 		// renderer.queueTestSquare();

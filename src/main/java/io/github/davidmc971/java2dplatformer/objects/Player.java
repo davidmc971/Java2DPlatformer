@@ -30,6 +30,7 @@ public class Player extends GameObject {
 		if (handler.getLevelHandler().getLevel() == 2) {
 			this.gravity *= 0.5f;
 		}
+		setCastsShadow(true);
 	}
 
 	public void update(float dt, List<GameObject> object) {
@@ -125,7 +126,7 @@ public class Player extends GameObject {
 	public void render(Renderer renderer) {
 		renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, dimensions.x,
 				dimensions.y,
-				200f / 255f, 100f / 255f, 0f / 255f, 127);
+				200f / 255f, 100f / 255f, 0f / 255f, 127, isCastsShadow());
 		if (Game.DEBUG) {
 			Rectangle[] bounds = getBoundsAll(interpolatedPosition);
 			for (int i = 0; i < bounds.length; i++) {

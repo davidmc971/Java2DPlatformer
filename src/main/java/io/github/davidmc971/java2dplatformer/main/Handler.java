@@ -65,13 +65,18 @@ public class Handler {
 
 	private Player playerReference = null;
 
-	public void render(Renderer renderer, float lerp, Camera camera) {
+	public void preRender(float lerp, Camera camera) {
 		if (playerReference != null) {
 			playerReference.preRender(lerp);
 			camera.tick(playerReference);
+		}
+	}
+
+	public void render(Renderer renderer, float lerp, Camera camera) {
+		if(playerReference != null) {
 			playerReference.render(renderer);
 		}
-
+		
 		for (GameObject tempObject : objects) {
 			switch (tempObject.getId()) {
 				case Background:

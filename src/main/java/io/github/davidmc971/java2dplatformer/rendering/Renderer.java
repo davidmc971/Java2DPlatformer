@@ -36,6 +36,7 @@ public class Renderer {
     private int fboScene, sceneMapId;
     private IntBuffer drawBuffers;
     private int fbVao, fbVbo, uLocFbTex;
+    private int bgVao, bgVbo;
 
     private Matrix4f combinedMVP = new Matrix4f();
 
@@ -46,6 +47,16 @@ public class Renderer {
             1, -1, 1, 0, // br
             1, 1, 1, 1, // tr
             -1, 1, 0, 1 // tl
+    };
+
+    private static float BG_QUAD_FACTOR = 0.25f;
+    private float[] bgQuad = {
+            1, -1, 16 * BG_QUAD_FACTOR, 0, // br
+            -1, -1, 0, 0, // bl
+            -1, 1, 0, -9 * BG_QUAD_FACTOR, // tl
+            1, -1, 16 * BG_QUAD_FACTOR, 0, // br
+            1, 1, 16 * BG_QUAD_FACTOR, -9 * BG_QUAD_FACTOR, // tr
+            -1, 1, 0, -9 * BG_QUAD_FACTOR // tl
     };
 
     private FloatBuffer vertexBuffer;
@@ -61,6 +72,7 @@ public class Renderer {
     private Texture textureBrick1;
     private Texture textureBrick2;
     private Texture textureBrick3;
+    private Texture textureCobble1;
 
     private static final int RENDER_BATCH_QUAD_AMOUNT = 8192;
 
@@ -90,6 +102,7 @@ public class Renderer {
         textureBrick1 = AssetManager.getTextureInternal("/img/textures/Brick-01.png");
         textureBrick2 = AssetManager.getTextureInternal("/img/textures/Brick-02.png");
         textureBrick3 = AssetManager.getTextureInternal("/img/textures/Brick-03.png");
+        textureCobble1 = AssetManager.getTextureInternal("/img/textures/Cobble-01.png");
 
         uLocModel = shaderProgram.uniform("model");
         uLocView = shaderProgram.uniform("view");
@@ -158,6 +171,19 @@ public class Renderer {
         fbVbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, fbVbo);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, fbQuad, GL15.GL_STATIC_DRAW);
+
+        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 4 * Float.BYTES, 0);
+        GL20.glEnableVertexAttribArray(0);
+
+        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 4 * Float.BYTES, 2 * Float.BYTES);
+        GL20.glEnableVertexAttribArray(1);
+
+        bgVao = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(bgVao);
+
+        bgVbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, bgVbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, bgQuad, GL15.GL_STATIC_DRAW);
 
         GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 4 * Float.BYTES, 0);
         GL20.glEnableVertexAttribArray(0);
@@ -255,7 +281,7 @@ public class Renderer {
         GL20.glUseProgram(0);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
-        GL11.glClearColor(0, 0, 20f / 255f, 1);
+        GL11.glClearColor(1, 1, 0.9f, 1);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboLightingSystem);
@@ -280,18 +306,38 @@ public class Renderer {
             GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
         }
 
-        GL33.glBlendEquation(GL33.GL_FUNC_ADD);
-        GL33.glBlendFuncSeparate(GL33.GL_ONE, GL33.GL_ONE, GL33.GL_ONE, GL33.GL_ZERO);
-        renderSceneFromFb(1, lightingMapId);
+        // renderSceneFromFb(2, textureCobble1.textureId, bgVao, bgVbo, -1f);
 
         GL33.glBlendEquation(GL33.GL_FUNC_ADD);
-        GL33.glBlendFuncSeparate(GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA, GL33.GL_DST_COLOR, GL33.GL_DST_COLOR);
+        GL33.glBlendFuncSeparate(
+                GL33.GL_ZERO, GL33.GL_SRC_COLOR,
+                GL33.GL_ZERO, GL33.GL_SRC_COLOR);
+        renderSceneFromFb(1, lightingMapId, 0.9f);
+
+        // GL33.glBlendEquation(GL33.GL_FUNC_ADD);
+        // GL33.glBlendFuncSeparate(
+        //         GL33.GL_SRC_COLOR, GL33.GL_DST_COLOR,
+        //         GL33.GL_ONE, GL33.GL_SRC_ALPHA);
+        // renderSceneFromFb(0, sceneMapId, 3.5f);
+
+        GL33.glBlendEquation(GL33.GL_FUNC_ADD);
+        GL33.glBlendFuncSeparate(
+                GL33.GL_DST_COLOR, GL33.GL_ONE_MINUS_SRC_ALPHA,
+                GL33.GL_ONE_MINUS_SRC_COLOR, GL33.GL_ONE_MINUS_SRC_ALPHA);
         renderSceneFromFb(0, sceneMapId);
+    }
+
+    public void renderSceneFromFb(int fbTexId, int drawMapId, float alpha) {
+        renderSceneFromFb(fbTexId, drawMapId, fbVao, fbVbo, alpha);
 
     }
 
     public void renderSceneFromFb(int fbTexId, int drawMapId) {
-        GL30.glBindVertexArray(fbVao);
+        renderSceneFromFb(fbTexId, drawMapId, fbVao, fbVbo, -1f);
+    }
+
+    public void renderSceneFromFb(int fbTexId, int drawMapId, int vao, int vbo, float alpha) {
+        GL30.glBindVertexArray(vao);
         GL20.glUseProgram(renderedSceneProgram.programId);
 
         GL13.glActiveTexture(GLTextureSlot.get(fbTexId).glTextureSlot);
@@ -299,11 +345,14 @@ public class Renderer {
 
         GL33.glUniform1i(uLocFbTex, fbTexId);
         GL20.glEnableVertexAttribArray(0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, fbVbo);
+        GL20.glEnableVertexAttribArray(1);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 
+        GL33.glUniform1f(renderedSceneProgram.uniform("alpha"), alpha);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
 
         GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
 
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);

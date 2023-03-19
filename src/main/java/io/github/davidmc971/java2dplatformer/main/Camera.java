@@ -19,7 +19,7 @@ public class Camera {
 		this.m4fView = new Matrix4f();
 	}
 
-	private float l, r, b, t, zoom = 1.5f, zfW, zfH;
+	private float l, r, b, t, zoom = 1f, zfW, zfH;
 
 	public void setupOrtho(float width, float height) {
 		w = width;
