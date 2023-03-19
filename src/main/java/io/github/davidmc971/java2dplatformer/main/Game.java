@@ -31,7 +31,7 @@ public class Game implements Runnable {
 	private KeyInput keyInput;
 	private Camera cam;
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	public static final boolean VSYNC = false;
 	public static final boolean ENABLE_FRAME_LIMITER = false;
 	public static final int MAX_FRAMES_PER_SECOND = 300;
@@ -237,5 +237,9 @@ public class Game implements Runnable {
 
 	public LevelHandler getLevelHandler() {
 		return levelh;
+	}
+
+	public Renderer getRenderer() {
+		return renderer;
 	}
 }

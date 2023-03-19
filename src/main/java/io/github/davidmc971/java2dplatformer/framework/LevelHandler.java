@@ -49,12 +49,16 @@ public class LevelHandler {
 
 		System.out.println("Loading level from image sized " + w + "x" + h);
 
+		boolean castsShadow;
+
+		int pixel, red, green, blue;
+
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
-				int pixel = image.getRGB(i, j);
-				int red = (pixel >> 16) & 0xff;
-				int green = (pixel >> 8) & 0xff;
-				int blue = (pixel) & 0xff;
+				pixel = image.getRGB(i, j);
+				red = (pixel >> 16) & 0xff;
+				green = (pixel >> 8) & 0xff;
+				blue = (pixel) & 0xff;
 
 				/*
 				 * Normale Blöcke sind schwarz (0,0,0);
@@ -67,7 +71,16 @@ public class LevelHandler {
 				 */
 
 				if (red == 0 && green == 0 && blue == 0) {
-					handler.addObject(new Block(i * 32, j * 32, ObjectId.Block));
+					castsShadow = true;
+					if(i != 0 && j != 0 && i + 1 < w && j + 1 < h) {
+						if(image.getRGB(i - 1, j) == 0
+						&& image.getRGB(i + 1, j) == 0
+						&& image.getRGB(i, j - 1) == 0
+						&& image.getRGB(i, j + 1) == 0) castsShadow = false;
+					}
+					handler.addObject(new Block(i * 32, j * 32, ObjectId.Block, castsShadow));
+				} else if (red == 255 && green == 255 && blue == 127) {
+					handler.getGame().getRenderer().addLight(i * 32 + 16, j * 32 + 16, 0);
 				} else if (red == 150 && green == 150 && blue == 150) {
 					// handler.addObject(new Player(i*32, j*32, handler, ObjectId.Player));
 				} else if (red == 0 && green == 255 && blue == 0) {
@@ -94,7 +107,7 @@ public class LevelHandler {
 
 			}
 		}
-		handler.centerOnPlayer();
+		//handler.centerOnPlayer();
 	}
 
 	public boolean isLoading() {

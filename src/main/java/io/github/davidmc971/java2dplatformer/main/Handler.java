@@ -1,13 +1,10 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.joml.Vector3f;
 
 import io.github.davidmc971.java2dplatformer.framework.GameObject;
 import io.github.davidmc971.java2dplatformer.framework.LevelHandler;
@@ -69,6 +66,11 @@ public class Handler {
 	private Player playerReference = null;
 
 	public void render(Renderer renderer, float lerp, Camera camera) {
+		if (playerReference != null) {
+			playerReference.preRender(lerp);
+			camera.tick(playerReference);
+			playerReference.render(renderer);
+		}
 
 		for (GameObject tempObject : objects) {
 			switch (tempObject.getId()) {
@@ -80,11 +82,6 @@ public class Handler {
 				default:
 					tempObject.onRender(renderer, lerp);
 			}
-		}
-
-		if (playerReference != null) {
-			playerReference.onRender(renderer, lerp);
-			camera.tick(playerReference);
 		}
 	}
 
@@ -130,5 +127,9 @@ public class Handler {
 		// 	object.getPosition().sub(position);
 		// });
 		// System.out.println(objects.get(objects.size() - 1).getPosition().toString(new DecimalFormat("0.###")));
+	}
+
+	public Game getGame() {
+		return game;
 	}
 }

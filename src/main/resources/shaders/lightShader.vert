@@ -6,15 +6,11 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
-uniform vec2 lightPosition;
-uniform float lightIndex;
-
-out vec2 fLightPosition;
 out vec2 fPosition;
 
 void main() {
-  fLightPosition = (projectionMatrix * viewMatrix * vec4(lightPosition, 0, 1)).xy;
+  vec4 lightPos_world = vec4(aPosition.xy, 0, 1);
+  gl_Position = projectionMatrix * viewMatrix * lightPos_world;
   fPosition = aPosition.xy;
-  gl_Position = vec4(aPosition.xy, -lightIndex, 1);
 }
 

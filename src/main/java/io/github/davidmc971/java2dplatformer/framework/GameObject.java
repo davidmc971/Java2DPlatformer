@@ -15,6 +15,7 @@ public abstract class GameObject {
 	protected Vector3f dimensions = new Vector3f(32, 32, 0);
 	protected Vector3f velocity = new Vector3f();
 	protected Vector4f color = new Vector4f(1, 1, 1, 1);
+	private boolean castsShadow = false;
 
 	protected boolean falling = true, jumping = false;
 
@@ -138,5 +139,13 @@ public abstract class GameObject {
 
 	public Vector4f getColor() {
 		return color;
+	}
+
+	public boolean isCastsShadow() {
+		return castsShadow;
+	}
+
+	public void setCastsShadow(boolean castsShadow) {
+		this.castsShadow = castsShadow;
 	}
 }

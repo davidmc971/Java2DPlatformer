@@ -68,7 +68,7 @@ public class Renderer {
     private List<Vector4f> lights = new ArrayList<>();
     private Vector4f mouseLight = new Vector4f();
     private int fboLightingSystem, lightingMapId;
-    private static int LIGHTING_RESOLUTION_DIVISOR = 4;
+    public static int LIGHTING_RESOLUTION_DIVISOR = 4;
 
     public void initialize(Camera camera) {
         this.camera = camera;
@@ -176,22 +176,23 @@ public class Renderer {
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, Game.WIDTH / LIGHTING_RESOLUTION_DIVISOR,
                 Game.HEIGHT / LIGHTING_RESOLUTION_DIVISOR, 0, GL11.GL_RGBA,
                 GL11.GL_UNSIGNED_BYTE, 0);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, lightingMapId,
                 0);
 
-        // create a renderbuffer object to store depth info
-        int rboId = GL30.glGenRenderbuffers();
-        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, rboId);
-        GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH_COMPONENT, Game.WIDTH, Game.HEIGHT);
-        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
-        // attach the renderbuffer to depth attachment point
-        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, // 1. fbo target: GL_FRAMEBUFFER
-                GL30.GL_DEPTH_ATTACHMENT, // 2. attachment point
-                GL30.GL_RENDERBUFFER, // 3. rbo target: GL_RENDERBUFFER
-                rboId); // 4. rbo ID
+        // // create a renderbuffer object to store depth info
+        // int rboId = GL30.glGenRenderbuffers();
+        // GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, rboId);
+        // GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH_COMPONENT,
+        // Game.WIDTH, Game.HEIGHT);
+        // GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
+        // // attach the renderbuffer to depth attachment point
+        // GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, // 1. fbo target:
+        // GL_FRAMEBUFFER
+        // GL30.GL_DEPTH_ATTACHMENT, // 2. attachment point
+        // GL30.GL_RENDERBUFFER, // 3. rbo target: GL_RENDERBUFFER
+        // rboId); // 4. rbo ID
 
         drawBuffers.put(GL30.GL_COLOR_ATTACHMENT1).flip();
         GL20.glDrawBuffers(drawBuffers);
@@ -199,7 +200,7 @@ public class Renderer {
         assert GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER) == GL30.GL_FRAMEBUFFER_COMPLETE
                 : "Framebuffer initialization error.";
 
-        lightingSystem = new LightingSystem(camera);
+        lightingSystem = new LightingSystem(camera, this);
         lights.add(mouseLight);
     }
 
@@ -253,6 +254,10 @@ public class Renderer {
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
 
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL11.glClearColor(0, 0, 20f / 255f, 1);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboLightingSystem);
         GL11.glViewport(0, 0, Game.WIDTH / LIGHTING_RESOLUTION_DIVISOR, Game.HEIGHT / LIGHTING_RESOLUTION_DIVISOR);
 
@@ -261,29 +266,31 @@ public class Renderer {
         lightingSystem.invoke(lights);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
-        GL11.glClearColor(0, 0, 0, 0);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
-        GL11.glViewport(
-                0, Game.HEIGHT / 2,
-                Game.WIDTH / 2, Game.HEIGHT / 2);
+        if (Game.DEBUG) {
+            GL11.glViewport(
+                    0, Game.HEIGHT / 2,
+                    Game.WIDTH / 2, Game.HEIGHT / 2);
+            renderSceneFromFb(0, sceneMapId);
 
-        renderSceneFromFb(0, sceneMapId);
+            GL11.glViewport(
+                    0, 0,
+                    Game.WIDTH / 2, Game.HEIGHT / 2);
+        } else {
+            GL11.glViewport(0, 0, Game.WIDTH, Game.HEIGHT);
+        }
 
-        GL11.glViewport(
-                Game.WIDTH / 2, Game.HEIGHT / 2,
-                Game.WIDTH / 2, Game.HEIGHT / 2);
-
+        GL33.glBlendEquation(GL33.GL_FUNC_ADD);
+        GL33.glBlendFuncSeparate(GL33.GL_ONE, GL33.GL_ONE, GL33.GL_ONE, GL33.GL_ZERO);
         renderSceneFromFb(1, lightingMapId);
 
-        GL11.glViewport(
-                Game.WIDTH / 4, 0,
-                Game.WIDTH / 2, Game.HEIGHT / 2);
-        renderSceneFromFb(1, lightingMapId);
+        GL33.glBlendEquation(GL33.GL_FUNC_ADD);
+        GL33.glBlendFuncSeparate(GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA, GL33.GL_DST_COLOR, GL33.GL_DST_COLOR);
         renderSceneFromFb(0, sceneMapId);
+
     }
 
-    private void renderSceneFromFb(int fbTexId, int drawMapId) {
+    public void renderSceneFromFb(int fbTexId, int drawMapId) {
         GL30.glBindVertexArray(fbVao);
         GL20.glUseProgram(renderedSceneProgram.programId);
 
@@ -303,14 +310,19 @@ public class Renderer {
     }
 
     private boolean willAddLight = false;
+    private int lightCounter = 1;
 
     private void checkAddLight() {
         if (!willAddLight && Game.MOUSE_DOWN) {
             willAddLight = true;
         } else if (willAddLight && !Game.MOUSE_DOWN) {
-            lights.add(new Vector4f().set(mousePositionWorldSpace, 0));
+            addLight(mousePositionWorldSpace.x(), mousePositionWorldSpace.y(), mousePositionWorldSpace.z());
             willAddLight = false;
         }
+    }
+
+    public void addLight(float x, float y, float z) {
+        lights.add(new Vector4f().set(x, y, z, lightCounter++));
     }
 
     public void render(io.github.davidmc971.java2dplatformer.ecs.GameObject gameObject) {
@@ -357,6 +369,16 @@ public class Renderer {
 
     private void drawQuadAny(/* position */ float x, float y, float z, /* dimensions */ float w, float h,
             /* color */ float r, float g, float b, float a, /* texture id */ float texId, boolean castsShadow) {
+        if (castsShadow && camera.coordsVisible2D(
+                x - Game.WIDTH / 2,
+                y - Game.HEIGHT / 2,
+                w + Game.WIDTH,
+                h + Game.HEIGHT)) {
+            // We are adding the diagonals of the quad into the shadow region buffer as
+            // quads themselves.
+            lightingSystem.insertShadowDiagonals(x, y, x + w, y + h);
+        }
+
         if (!camera.coordsVisible2D(x, y, w, h))
             return;
 
@@ -414,5 +436,17 @@ public class Renderer {
         MemoryUtil.memFree(fbProjectionMatrix);
         MemoryUtil.memFree(fbViewMatrix);
         MemoryUtil.memFree(fbModelMatrix);
+    }
+
+    public int getSceneMapId() {
+        return sceneMapId;
+    }
+
+    public int getLightingMapId() {
+        return lightingMapId;
+    }
+
+    public int getFboLightingSystem() {
+        return fboLightingSystem;
     }
 }

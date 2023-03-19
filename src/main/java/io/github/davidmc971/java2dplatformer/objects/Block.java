@@ -8,10 +8,15 @@ import io.github.davidmc971.java2dplatformer.framework.ObjectId;
 import io.github.davidmc971.java2dplatformer.rendering.Renderer;
 
 public class Block extends io.github.davidmc971.java2dplatformer.framework.GameObject {
-
 	public Block(float x, float y, ObjectId id) {
-		super(x, y, id);
+		this(x, y, id, false);
 	}
+
+	public Block(float x, float y, ObjectId id, boolean castsShadow) {
+		super(x, y, id);
+		setCastsShadow(castsShadow);
+	}
+
 
 	public void update(float dt, List<GameObject> object) {
 
@@ -21,7 +26,7 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 		switch (getId()) {
 			case Block:
 				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						0f / 255f, 255f / 255f, 0f / 255f, 1, 0, true);
+						0f / 255f, 255f / 255f, 0f / 255f, 1, 0, isCastsShadow());
 				break;
 			case Finish:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 16, 16,

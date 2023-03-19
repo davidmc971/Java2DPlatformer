@@ -1,6 +1,5 @@
 package io.github.davidmc971.java2dplatformer.main;
 
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -102,5 +101,9 @@ public class Camera {
 	public Vector2fc worldPositionToScreenPosition(Vector3fc worldPosition) {
 		// TODO:
 		return new Vector2f();
+	}
+
+	public Vector3fc getPosition() {
+		return v3fPosition;
 	}
 }
