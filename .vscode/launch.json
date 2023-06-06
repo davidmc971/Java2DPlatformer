@@ -2,10 +2,25 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Start",
+      "name": "Start (DRI_PRIME=0)",
       "request": "launch",
       "mainClass": "io.github.davidmc971.java2dplatformer.Start",
-      "projectName": "Java2DPlatformer"
+      "projectName": "Java2DPlatformer",
+      "env": {
+        // internal graphics (amdgpu)
+        "DRI_PRIME": 0
+      }
+    },
+    {
+      "type": "java",
+      "name": "Start (DRI_PRIME=1)",
+      "request": "launch",
+      "mainClass": "io.github.davidmc971.java2dplatformer.Start",
+      "projectName": "Java2DPlatformer",
+      "env": {
+        // dedicated graphics (amdgpu)
+        "DRI_PRIME": 1
+      }
     }
   ]
 }
