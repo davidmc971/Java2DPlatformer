@@ -8,14 +8,14 @@ import java.util.List;
 import io.github.davidmc971.java2dplatformer.main.Updatable;
 
 public class ECSEngine implements Updatable {
-  private List<GameObject> entities = new ArrayList<>();
+  private List<Entity> entities = new ArrayList<>();
 
   private HashMap<Class<? extends Component>, List<Component>> componentPool = new HashMap<>();
   private List<Component> lastCheckedComponentList = null;
 
   private List<EntitySystem> entitySystems = new ArrayList<>();
 
-  public void addEntity(GameObject entityGameObject) {
+  public void addEntity(Entity entityGameObject) {
     entityGameObject.getComponents().forEach((c) -> {
       lastCheckedComponentList = componentPool.get(c.getClass());
       if (lastCheckedComponentList == null) {

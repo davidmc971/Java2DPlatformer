@@ -3,7 +3,7 @@ package io.github.davidmc971.java2dplatformer.ecs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameObject {
+public class Entity {
   private static long ENTITY_ID_COUNTER = 0;
 
   private long entityId = ENTITY_ID_COUNTER++;
@@ -38,7 +38,7 @@ public class GameObject {
     }
   }
 
-  public GameObject addComponent(Component c) {
+  public Entity addComponent(Component c) {
     components.add(c);
     c.gameObject = this;
     return this;

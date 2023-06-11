@@ -374,7 +374,7 @@ public class Renderer {
         lights.add(new Vector4f().set(x, y, z, lightCounter++));
     }
 
-    public void render(io.github.davidmc971.java2dplatformer.ecs.GameObject gameObject) {
+    public void render(io.github.davidmc971.java2dplatformer.ecs.Entity gameObject) {
 
     }
 
