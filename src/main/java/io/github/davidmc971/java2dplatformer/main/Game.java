@@ -65,7 +65,7 @@ public class Game implements Runnable {
 
 	public static int drawCalls = 0;
 
-	protected void interpolationGameLoop() {
+	private void interpolationGameLoop() {
 		long lastTime = System.nanoTime();
 		double maxFramesPerSecond = 300;
 		double minFrameTime = 1 / maxFramesPerSecond;
@@ -198,8 +198,8 @@ public class Game implements Runnable {
 	private DoubleBuffer mouseYBuffer = BufferUtils.createDoubleBuffer(1);
 
 	private void update(float t, float dt) {
-		handler.tick(t, dt);
 		keyInput.checkKeys();
+		handler.tick(t, dt);
 	}
 
 	private void render(float renderLerp) {

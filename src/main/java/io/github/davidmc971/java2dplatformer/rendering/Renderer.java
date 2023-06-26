@@ -374,10 +374,6 @@ public class Renderer {
         lights.add(new Vector4f().set(x, y, z, lightCounter++));
     }
 
-    public void render(io.github.davidmc971.java2dplatformer.ecs.Entity gameObject) {
-
-    }
-
     private int batchElementOffset = 0;
     private static Vector4f colorWhite = new Vector4f(1, 1, 1, 1);
 
