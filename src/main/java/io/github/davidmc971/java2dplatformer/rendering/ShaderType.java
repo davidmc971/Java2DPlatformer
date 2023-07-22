@@ -1,10 +1,11 @@
 package io.github.davidmc971.java2dplatformer.rendering;
 
 import org.lwjgl.opengl.GL20;
-
+import org.lwjgl.opengl.GL32;
 public enum ShaderType {
   FRAGMENT(GL20.GL_FRAGMENT_SHADER, "frag"),
-  VERTEX(GL20.GL_VERTEX_SHADER, "vert");
+  VERTEX(GL20.GL_VERTEX_SHADER, "vert"),
+  GEOMETRY(GL32.GL_GEOMETRY_SHADER, "geom");
 
   public final int glShaderTypeId;
   public final String fileExtension;

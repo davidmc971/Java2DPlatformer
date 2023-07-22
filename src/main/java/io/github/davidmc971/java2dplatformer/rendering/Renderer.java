@@ -427,11 +427,11 @@ public class Renderer {
         if (!camera.coordsVisible2D(x, y, w, h))
             return;
 
-        if (castsShadow) {
-            // We are adding the diagonals of the quad into the shadow region buffer as
-            // quads themselves.
-            lightingSystem.insertShadowDiagonals(x, y, x + w, y + h);
-        }
+        // if (castsShadow) {
+        //     // We are adding the diagonals of the quad into the shadow region buffer as
+        //     // quads themselves.
+        //     lightingSystem.insertShadowDiagonals(x, y, x + w, y + h);
+        // }
 
         if (vertexBuffer.remaining() < 4 || elementBuffer.remaining() < 6)
             flush();

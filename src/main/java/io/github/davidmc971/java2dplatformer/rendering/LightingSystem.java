@@ -68,6 +68,7 @@ public class LightingSystem {
             lightShaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/lightShader.vert"));
             lightShaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/lightShader.frag"));
             shadowShaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/shadowMap.vert"));
+            shadowShaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/shadowMap.geom"));
             shadowShaderProgram.attachShader(AssetManager.getShaderInternal("/shaders/shadowMap.frag"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,12 +102,13 @@ public class LightingSystem {
         GL33.glBufferData(GL33.GL_ARRAY_BUFFER, shadowDiagonalsBuffer.capacity(), GL33.GL_DYNAMIC_DRAW);
 
         // Shadow buffer contains diagonal boxes with flags on moveable edges
+        // Update, contains just the diagonal lines for processing in geometry shader
 
-        GL33.glVertexAttribPointer(0, 3, GL33.GL_FLOAT, false, 4 * Float.BYTES, 0);
+        GL33.glVertexAttribPointer(0, 2, GL33.GL_FLOAT, false, 2 * Float.BYTES, 0);
         GL33.glEnableVertexAttribArray(0);
 
-        GL33.glVertexAttribPointer(1, 1, GL33.GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
-        GL33.glEnableVertexAttribArray(1);
+        // GL33.glVertexAttribPointer(1, 1, GL33.GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
+        // GL33.glEnableVertexAttribArray(1);
     }
 
     public void insertShadowDiagonals(float x1, float y1, float x2, float y2) {
@@ -116,17 +118,12 @@ public class LightingSystem {
             return;
         }
 
-        putShadowQuad(shadowDiagonalsBuffer, x1, y1, x2, y2);
-        putShadowQuad(shadowDiagonalsBuffer, x2, y1, x1, y2);
+        putShadowLine(shadowDiagonalsBuffer, x1, y1, x2, y2);
+        putShadowLine(shadowDiagonalsBuffer, x2, y1, x1, y2);
     }
 
-    private void putShadowQuad(FloatBuffer target, float x1, float y1, float x2, float y2) {
-        target.put(x1).put(y2).put(0).put(1)
-                .put(x1).put(y2).put(0).put(0)
-                .put(x2).put(y1).put(0).put(1)
-                .put(x2).put(y1).put(0).put(1)
-                .put(x2).put(y1).put(0).put(0)
-                .put(x1).put(y2).put(0).put(0);
+    private void putShadowLine(FloatBuffer target, float x1, float y1, float x2, float y2) {
+        target.put(x1).put(y1).put(x2).put(y2);
     }
 
     public void invoke(List<? extends Vector4fc> lights) {
@@ -150,14 +147,14 @@ public class LightingSystem {
         shadowShaderProgram.use();
         shadowShaderProgram.sendUniformMatrix4f("projectionMatrix", projectionMatrixBuffer.position(0));
         shadowShaderProgram.sendUniformMatrix4f("viewMatrix", viewMatrixBuffer.position(0));
-        shadowShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
+        // shadowShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
 
         // modelMatrix.identity().translate(camera.getPosition()).get(modelMatrixBuffer.position(0));
 
         lightShaderProgram.use();
         lightShaderProgram.sendUniformMatrix4f("projectionMatrix", projectionMatrixBuffer.position(0));
         lightShaderProgram.sendUniformMatrix4f("viewMatrix", viewMatrixBuffer.position(0));
-        lightShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
+        // lightShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
         GL33.glUseProgram(0);
 
         currentBatchSize = shadowDiagonalsBuffer.position();
@@ -203,15 +200,15 @@ public class LightingSystem {
         GL33.glBindVertexArray(shadowVao);
         shadowShaderProgram.use();
         GL33.glUniform3f(shadowShaderProgram.uniform("lightPosition"), light.x(), light.y(), light.z());
-        GL33.glUniform1f(shadowShaderProgram.uniform("lightIndex"), light.w());
+        // GL33.glUniform1f(shadowShaderProgram.uniform("lightIndex"), light.w());
 
         GL33.glEnableVertexAttribArray(0);
-        GL33.glEnableVertexAttribArray(1);
+        // GL33.glEnableVertexAttribArray(1);
 
-        GL33.glDrawArrays(GL33.GL_TRIANGLES, 0, currentBatchSize);
+        GL33.glDrawArrays(GL33.GL_LINES, 0, currentBatchSize);
 
         GL33.glDisableVertexAttribArray(0);
-        GL33.glDisableVertexAttribArray(1);
+        // GL33.glDisableVertexAttribArray(1);
 
         GL33.glBindVertexArray(0);
         GL33.glUseProgram(0);
@@ -221,7 +218,7 @@ public class LightingSystem {
         GL33.glBindVertexArray(lightVao);
         lightShaderProgram.use();
         GL33.glUniform3f(lightShaderProgram.uniform("lightPosition"), light.x(), light.y(), light.z());
-        GL33.glUniform1f(lightShaderProgram.uniform("lightIndex"), light.w());
+        // GL33.glUniform1f(lightShaderProgram.uniform("lightIndex"), light.w());
 
         GL33.glEnableVertexAttribArray(0);
 
