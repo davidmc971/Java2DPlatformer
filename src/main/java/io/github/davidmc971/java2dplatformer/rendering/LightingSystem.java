@@ -157,7 +157,8 @@ public class LightingSystem {
         // lightShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
         GL33.glUseProgram(0);
 
-        currentBatchSize = shadowDiagonalsBuffer.position();
+        // Divide by two because two floats per line
+        currentBatchSize = shadowDiagonalsBuffer.position() / 2;
         shadowDiagonalsBuffer.flip();
 
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, shadowVbo);
