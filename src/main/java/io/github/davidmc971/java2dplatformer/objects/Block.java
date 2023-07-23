@@ -41,7 +41,7 @@ public class Block extends io.github.davidmc971.java2dplatformer.framework.GameO
 				break;
 			case Death:
 				renderer.drawTexturedQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,
-						200f / 255f, 0, 0, 1, 1);
+						200f / 255f, 0, 0, 1, 3);
 				break;
 			case Check:
 				renderer.drawQuad(interpolatedPosition.x, interpolatedPosition.y, interpolatedPosition.z, 32, 32,

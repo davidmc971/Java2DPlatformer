@@ -244,6 +244,7 @@ public class Renderer {
         textureBrick1.bind(0);
         textureBrick2.bind(1);
         textureBrick3.bind(2);
+        textureCobble1.bind(3);
         shaderProgram.sendTextureUniform("textureSampler", GLTextureSlot.getMaxTextureSlotsNumberArray());
 
         GL30.glBindVertexArray(vao);
