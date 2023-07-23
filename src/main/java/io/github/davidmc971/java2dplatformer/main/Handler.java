@@ -117,6 +117,7 @@ public class Handler {
 	public void clearObjects() {
 		playerReference = null;
 		objects.clear();
+		this.game.getRenderer().clearLights();
 	}
 
 	public void centerOnPlayer() {

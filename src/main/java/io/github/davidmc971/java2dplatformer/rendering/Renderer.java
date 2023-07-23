@@ -227,7 +227,7 @@ public class Renderer {
                 : "Framebuffer initialization error.";
 
         lightingSystem = new LightingSystem(camera, this);
-        lights.add(mouseLight);
+        // lights.add(mouseLight);
     }
 
     public void preFrame() {
@@ -289,7 +289,9 @@ public class Renderer {
 
         checkAddLight();
         mouseLight.set(mousePositionWorldSpace, 0);
+        lights.add(mouseLight);
         lightingSystem.invoke(lights);
+        lights.remove(mouseLight);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 
@@ -372,6 +374,10 @@ public class Renderer {
 
     public void addLight(float x, float y, float z) {
         lights.add(new Vector4f().set(x, y, z, lightCounter++));
+    }
+
+    public void clearLights() {
+        lights.clear();
     }
 
     private int batchElementOffset = 0;
