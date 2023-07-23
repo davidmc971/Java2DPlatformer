@@ -31,11 +31,10 @@ vec2 move(vec2 point) {
 void main() {
   vec2 p1 = gl_in[0].gl_Position.xy;
   vec2 p2 = gl_in[1].gl_Position.xy;
-
-  vec2 midpoint = (p1 + p2) / 2;
-
+  
   // distance culling or whatever you call this
-  if (distanceLength(midpoint - lightPosition.xy) > 800) {
+  if (distanceLength(p1 - lightPosition.xy) > 800 &&
+      distanceLength(p2 - lightPosition.xy) > 800) {
     return;
   }
 
