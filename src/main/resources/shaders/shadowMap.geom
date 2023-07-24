@@ -12,9 +12,9 @@ float distanceLength(vec2 distance) {
   return sqrt(distance.x * distance.x + distance.y * distance.y);
 }
 
-vec2 scalarDistance(vec2 distance) {
-  return distance / distanceLength(distance);
-}
+// vec2 scalarDistance(vec2 distance) {
+//   return distance / distanceLength(distance);
+// }
 
 void emit(vec2 point) {
   gl_Position = projectionMatrix * viewMatrix * vec4(point, 0, 1);
@@ -24,7 +24,7 @@ void emit(vec2 point) {
 vec2 move(vec2 point) {
   vec2 pos = point;
   vec2 distance = pos - lightPosition.xy;
-  pos += scalarDistance(distance) * 1000;
+  pos += normalize(distance) * 1000;
   return pos;
 }
 

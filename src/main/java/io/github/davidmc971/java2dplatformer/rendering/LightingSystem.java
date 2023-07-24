@@ -26,6 +26,7 @@ public class LightingSystem {
     // Shadow shader
     private ShaderProgram shadowShaderProgram;
     private int shadowVao, shadowVbo;
+    private int floatsPerShadowVertex = 2;
 
     private FloatBuffer shadowDiagonalsBuffer;
     private int currentBatchSize = 0;
@@ -104,10 +105,12 @@ public class LightingSystem {
         // Shadow buffer contains diagonal boxes with flags on moveable edges
         // Update, contains just the diagonal lines for processing in geometry shader
 
-        GL33.glVertexAttribPointer(0, 2, GL33.GL_FLOAT, false, 2 * Float.BYTES, 0);
+        GL33.glVertexAttribPointer(0, floatsPerShadowVertex, GL33.GL_FLOAT, false, floatsPerShadowVertex * Float.BYTES,
+                0);
         GL33.glEnableVertexAttribArray(0);
 
-        // GL33.glVertexAttribPointer(1, 1, GL33.GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
+        // GL33.glVertexAttribPointer(1, 1, GL33.GL_FLOAT, false, 4 * Float.BYTES, 3 *
+        // Float.BYTES);
         // GL33.glEnableVertexAttribArray(1);
     }
 
@@ -147,18 +150,20 @@ public class LightingSystem {
         shadowShaderProgram.use();
         shadowShaderProgram.sendUniformMatrix4f("projectionMatrix", projectionMatrixBuffer.position(0));
         shadowShaderProgram.sendUniformMatrix4f("viewMatrix", viewMatrixBuffer.position(0));
-        // shadowShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
+        // shadowShaderProgram.sendUniformMatrix4f("modelMatrix",
+        // modelMatrixBuffer.position(0));
 
         // modelMatrix.identity().translate(camera.getPosition()).get(modelMatrixBuffer.position(0));
 
         lightShaderProgram.use();
         lightShaderProgram.sendUniformMatrix4f("projectionMatrix", projectionMatrixBuffer.position(0));
         lightShaderProgram.sendUniformMatrix4f("viewMatrix", viewMatrixBuffer.position(0));
-        // lightShaderProgram.sendUniformMatrix4f("modelMatrix", modelMatrixBuffer.position(0));
+        // lightShaderProgram.sendUniformMatrix4f("modelMatrix",
+        // modelMatrixBuffer.position(0));
         GL33.glUseProgram(0);
 
         // Divide by two because two floats per line
-        currentBatchSize = shadowDiagonalsBuffer.position() / 2;
+        currentBatchSize = shadowDiagonalsBuffer.position() / floatsPerShadowVertex;
         shadowDiagonalsBuffer.flip();
 
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, shadowVbo);
