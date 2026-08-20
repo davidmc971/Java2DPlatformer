@@ -121,8 +121,19 @@ public class LightingSystem {
             return;
         }
 
-        putShadowLine(shadowDiagonalsBuffer, x1, y1, x2, y2);
-        putShadowLine(shadowDiagonalsBuffer, x2, y1, x1, y2);
+        /*
+         * x1,y2  x2,y2
+         * 
+         * x1,y1  x2,y1
+         */
+
+        // putShadowLine(shadowDiagonalsBuffer, x1, y1, x2, y2);
+        // putShadowLine(shadowDiagonalsBuffer, x2, y1, x1, y2);
+
+        putShadowLine(shadowDiagonalsBuffer, x1, y1, x1, y2);
+        putShadowLine(shadowDiagonalsBuffer, x1, y2, x2, y2);
+        putShadowLine(shadowDiagonalsBuffer, x2, y2, x2, y1);
+        putShadowLine(shadowDiagonalsBuffer, x2, y1, x1, y1);
     }
 
     private void putShadowLine(FloatBuffer target, float x1, float y1, float x2, float y2) {

@@ -27,7 +27,7 @@ public class Game implements Runnable {
 	private String title = "";
 
 	private Handler handler;
-	private LevelHandler levelh;
+	private LevelHandler levelHandler;
 	private KeyInput keyInput;
 	private Camera cam;
 
@@ -176,9 +176,9 @@ public class Game implements Runnable {
 		glfwShowWindow(window);
 
 		handler = new Handler(this);
-		levelh = new LevelHandler(handler);
+		levelHandler = new LevelHandler(handler);
 
-		levelh.loadLevel(1);
+		levelHandler.loadLevel(1);
 
 		cam = new Camera(new Vector3f(0, 0, 0));
 		cam.setupOrtho(w, h);
@@ -237,7 +237,7 @@ public class Game implements Runnable {
 	}
 
 	public LevelHandler getLevelHandler() {
-		return levelh;
+		return levelHandler;
 	}
 
 	public Renderer getRenderer() {

@@ -25,6 +25,7 @@ public class Universe {
         return entityComponentMapping.get(entity);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Component> List<T> getComponents(Class<T> componentClass) {
         // TODO: safety
         return (List<T>) components.get(componentClass.getName());

@@ -24,7 +24,7 @@ void emit(vec2 point) {
 vec2 move(vec2 point) {
   vec2 pos = point;
   vec2 distance = pos - lightPosition.xy;
-  pos += normalize(distance) * 1000;
+  pos += normalize(distance) * 4096;
   return pos;
 }
 

@@ -2,6 +2,7 @@ package io.github.davidmc971.java2dplatformer.main;
 
 public abstract class Scene {
   protected Camera camera;
+  @SuppressWarnings("unused")
   private boolean isRunning = false;
 
   public Scene() {
